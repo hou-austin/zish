@@ -85,8 +85,8 @@ Unknown = ""
 Windows = ""
 
 [directory]
-format = "[](fg:blue)[ $read_only$path ]($style)[](fg:blue) "
-repo_root_format = "[](fg:blue)[ $read_only$repo_root$path ]($style)[](fg:blue) "
+format = "[](fg:blue)[ $read_only$path ]($style)"
+repo_root_format = "[](fg:blue)[ $read_only$repo_root$path ]($style)"
 style = "fg:white bg:blue"
 home_symbol = ""
 read_only = " "
@@ -96,14 +96,14 @@ fish_style_pwd_dir_length = 1
 repo_root_style = "fg:white bg:blue"
 
 [git_branch]
-format = "[](fg:git_green)[ $symbol$branch(:$remote_branch) ]($style)[](fg:git_green) "
-style = "fg:black bg:git_green"
+format = "[](fg:blue bg:git_yellow)[ $symbol$branch(:$remote_branch) ]($style)"
+style = "fg:black bg:git_yellow"
 symbol = " "
 truncation_length = 32
 truncation_symbol = "..."
 
 [git_status]
-format = "([](fg:git_yellow)[ $all_status$ahead_behind ]($style)[](fg:git_yellow) )"
+format = "([ $all_status$ahead_behind ]($style))"
 style = "fg:black bg:git_yellow"
 conflicted = "=${count} "
 ahead = "⇡${count} "
@@ -119,7 +119,7 @@ deleted = "x${count} "
 
 [cmd_duration]
 min_time = 0
-format = "[](fg:duration)[ ${duration} ]($style)[](fg:duration) "
+format = "[](fg:git_yellow bg:duration)[ ${duration} ]($style)[](fg:duration) "
 style = "fg:white bg:duration"
 show_milliseconds = false
 
