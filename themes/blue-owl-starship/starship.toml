@@ -38,7 +38,7 @@ black = "#000000"
 
 [os]
 disabled = false
-format = "[$symbol ]($style)"
+format = "[$symbol  ]($style)"
 style = "fg:white"
 
 [os.symbols]
@@ -119,7 +119,7 @@ deleted = "x${count} "
 
 [cmd_duration]
 min_time = 0
-format = "[](fg:git_yellow bg:duration)[ ${duration} ]($style)[](fg:duration) "
+format = "[](fg:git_yellow)[](fg:duration)[ ${duration} ]($style)[](fg:duration) "
 style = "fg:white bg:duration"
 show_milliseconds = false
 
