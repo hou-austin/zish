@@ -131,18 +131,18 @@ deleted = "x${count} "
 [custom.git_close]
 when = "git rev-parse --is-inside-work-tree >/dev/null 2>&1"
 command = "printf ''"
-format = "[ ](fg:git_yellow)"
+format = "[](fg:git_yellow)"
 shell = ["sh"]
 
 [cmd_duration]
 min_time = 0
-format = "[](fg:terminal_bg bg:duration)[ ${duration} ]($style)[ ](fg:duration)"
+format = "[](fg:terminal_bg bg:duration)[ ${duration} ]($style)[](fg:duration)"
 style = "fg:white bg:duration"
 show_milliseconds = false
 
 [status]
 disabled = false
-format = "[](fg:terminal_bg bg:danger)[ $symbol$status ]($style)[ ](fg:danger)"
+format = "[](fg:terminal_bg bg:danger)[ $symbol$status ]($style)[](fg:danger)"
 style = "fg:white bg:danger"
 symbol = "! "
 not_executable_symbol = "no-exec "

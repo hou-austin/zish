@@ -61,5 +61,5 @@ done
 printf ' '
 reset
 fg "$blue"
-printf ' '
+printf ''
 reset
