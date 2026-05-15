@@ -37,7 +37,7 @@ Potential package managers:
 
 The installer should detect package managers, not assume one from distro name alone.
 
-The current setup helper knows package names for Homebrew, apt, dnf, pacman, zypper, and apk. Some tools are not available through every manager in the current mapping; for example, `difftastic` is intentionally not installed through apt or apk by the current setup script, and `atuin` is intentionally not installed through apt or zypper.
+The current setup helper knows package names for Homebrew, apt, dnf, pacman, zypper, and apk. Some tools are not available through every manager in the current mapping; for example, `difftastic` is intentionally not installed through apt or apk by the current setup script, and `atuin` is intentionally not installed through zypper.
 
 ## macOS
 

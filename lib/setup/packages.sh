@@ -93,6 +93,7 @@ zish_package_for_tool() {
     apt:zsh-syntax-highlighting) printf '%s\n' zsh-syntax-highlighting ;;
     apt:fzf) printf '%s\n' fzf ;;
     apt:zoxide) printf '%s\n' zoxide ;;
+    apt:atuin) printf '%s\n' atuin ;;
 
     dnf:zsh) printf '%s\n' zsh ;;
     dnf:starship) printf '%s\n' starship ;;

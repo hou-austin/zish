@@ -1,13 +1,16 @@
 # Zish
 
-Zish is a multiplatform Zsh setup repository for Linux, macOS, and Windows through WSL. It is intended to carry shell themes, plugins, and configuration, plus an installer that can set up the full environment while migrating existing shell files reliably.
+Zish is a personal shell setup package for Linux, macOS, and Windows through WSL. It assembles one preferred Zsh environment from a curated set of tools, themes, plugins, and shell configuration, then installs that environment in a repeatable and inspectable way.
+
+This is not a general-purpose shell framework. Zish should mostly install packages, source official tool integrations, apply the selected theme, and keep local overrides easy to inspect. It should avoid becoming a compatibility layer that repairs or reimplements behavior owned by tools such as Atuin, fzf, zoxide, Starship, or Zsh plugins.
 
 Current status: initial documentation, a setup entrypoint, Zsh configuration modules, Starship prompt assets, managed package-based plugins, and modern CLI tool integration. Migration manifests, automated tests, and broader shell modules still need to be implemented against the contracts in `docs/`.
 
 ## Goals
 
-- Provide a repeatable Zsh setup for Linux, macOS, and WSL.
-- Keep themes, plugins, and configuration in one inspectable repository.
+- Provide a repeatable personal Zsh setup for Linux, macOS, and WSL.
+- Keep the selected tools, themes, plugins, and configuration in one inspectable repository.
+- Prefer official upstream integrations over hand-maintained local replacements.
 - Make installation safe by inventorying, backing up, and migrating existing shell paths before writing managed files.
 - Support interactive setup first, with dry-run and non-interactive modes for automation.
 - Keep platform-specific behavior explicit instead of hiding it in ad hoc conditionals.
@@ -27,6 +30,8 @@ See [docs/principles.md](docs/principles.md) for the decision rules behind these
 - Native Windows shell support outside WSL.
 - Managing every dotfile on the machine.
 - Replacing the system package manager.
+- Reimplementing third-party shell integrations or key-binding behavior by default.
+- Guaranteeing that every terminal, package build, or plugin combination behaves identically.
 - Silently overwriting unmanaged user files.
 
 ## Intended Layout

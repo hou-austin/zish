@@ -23,7 +23,7 @@ Current package-manager mapping:
 | Manager | Packages |
 | --- | --- |
 | Homebrew | `eza`, `bat`, `ripgrep`, `difftastic`, `fzf`, `zoxide`, `atuin` |
-| apt | `eza`, `bat`, `ripgrep`, `fzf`, `zoxide` |
+| apt | `eza`, `bat`, `ripgrep`, `fzf`, `zoxide`, `atuin` |
 | dnf | `eza`, `bat`, `ripgrep`, `difftastic`, `fzf`, `zoxide`, `atuin` |
 | pacman | `eza`, `bat`, `ripgrep`, `difftastic`, `fzf`, `zoxide`, `atuin` |
 | zypper | `eza`, `bat`, `ripgrep`, `difftastic`, `fzf`, `zoxide` |
