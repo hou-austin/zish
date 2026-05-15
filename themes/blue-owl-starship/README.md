@@ -8,6 +8,7 @@ This theme is a Starship port of the Oh My Posh `blue-owl` theme. It keeps the h
 - The aligned right section does not include the decorative leading marker from the original Oh My Posh theme.
 - The aligned right section does not include an outline separator between the user/hostname section and the time section.
 - The user/hostname and time sections are separated by background and foreground color differences.
+- The path segment uses a tiny local renderer so the prompt can keep Blue Owl's `home / ... / leaf` spacing inside the blue block.
 - Git status is represented with Starship's built-in Git modules instead of Oh My Posh templates.
 - The original left-side root marker is not enabled by default because Starship's sudo module adds measurable prompt latency even when it renders nothing.
 
