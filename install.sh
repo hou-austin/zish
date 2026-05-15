@@ -120,8 +120,16 @@ if [ "$DRY_RUN" -eq 1 ]; then
 fi
 
 if [ "$YES" -ne 1 ]; then
-  printf 'Apply this plan? [y/N] '
-  read answer
+  if { exec 3<>/dev/tty; } 2>/dev/null; then
+    printf 'Apply this plan? [y/N] ' >&3
+    IFS= read -r answer <&3 || answer=
+    exec 3<&-
+    exec 3>&-
+  else
+    printf 'Cannot prompt for confirmation because no terminal is available.\n' >&2
+    printf 'Rerun with --yes to approve the plan non-interactively.\n' >&2
+    exit 1
+  fi
   case "$answer" in
     y|Y|yes|YES) ;;
     *)

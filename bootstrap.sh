@@ -6,13 +6,13 @@ usage() {
     'Usage: bootstrap.sh [install args...]' \
     '' \
     'Environment overrides:' \
-    '  ZISH_REPO_URL   Git URL to clone. Default: https://github.com/austinhou/zish.git' \
+    '  ZISH_REPO_URL   Git URL to clone. Default: https://github.com/hou-austin/zish.git' \
     '  ZISH_BRANCH     Branch to checkout. Default: main' \
     '  ZISH_DIR        Local checkout path. Default: $HOME/.local/share/zish/repo' \
     '' \
     'Examples:' \
-    '  curl -fsSL https://raw.githubusercontent.com/austinhou/zish/main/bootstrap.sh | sh' \
-    '  curl -fsSL https://raw.githubusercontent.com/austinhou/zish/main/bootstrap.sh | sh -s -- --yes'
+    '  curl -fsSL https://raw.githubusercontent.com/hou-austin/zish/main/bootstrap.sh | sh' \
+    '  curl -fsSL https://raw.githubusercontent.com/hou-austin/zish/main/bootstrap.sh | sh -s -- --yes'
 }
 
 case "${1:-}" in
@@ -22,7 +22,7 @@ case "${1:-}" in
     ;;
 esac
 
-ZISH_REPO_URL="${ZISH_REPO_URL:-https://github.com/austinhou/zish.git}"
+ZISH_REPO_URL="${ZISH_REPO_URL:-https://github.com/hou-austin/zish.git}"
 ZISH_BRANCH="${ZISH_BRANCH:-main}"
 ZISH_DIR="${ZISH_DIR:-$HOME/.local/share/zish/repo}"
 

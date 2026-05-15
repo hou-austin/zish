@@ -29,13 +29,13 @@ The implementation should keep the same concepts: plan, apply, verify, update, a
 Once the repository is hosted, the intended one-line setup is:
 
 ```sh
-curl -fsSL https://raw.githubusercontent.com/austinhou/zish/main/bootstrap.sh | sh
+curl -fsSL https://raw.githubusercontent.com/hou-austin/zish/main/bootstrap.sh | sh
 ```
 
 Non-interactive setup can pass installer flags after `sh -s --`:
 
 ```sh
-curl -fsSL https://raw.githubusercontent.com/austinhou/zish/main/bootstrap.sh | sh -s -- --yes
+curl -fsSL https://raw.githubusercontent.com/hou-austin/zish/main/bootstrap.sh | sh -s -- --yes
 ```
 
 The bootstrap script:
@@ -43,6 +43,8 @@ The bootstrap script:
 1. Requires `git`.
 2. Clones or updates the repo.
 3. Runs `install.sh` from the checkout.
+
+Interactive confirmation reads from `/dev/tty`, so the prompt still works when bootstrap is run through `curl | sh`.
 
 Environment overrides:
 

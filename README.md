@@ -85,13 +85,13 @@ See [docs/platforms.md](docs/platforms.md) for the platform contract.
 Once this repo is published, setup can be run with:
 
 ```sh
-curl -fsSL https://raw.githubusercontent.com/austinhou/zish/main/bootstrap.sh | sh
+curl -fsSL https://raw.githubusercontent.com/hou-austin/zish/main/bootstrap.sh | sh
 ```
 
 For non-interactive setup:
 
 ```sh
-curl -fsSL https://raw.githubusercontent.com/austinhou/zish/main/bootstrap.sh | sh -s -- --yes
+curl -fsSL https://raw.githubusercontent.com/hou-austin/zish/main/bootstrap.sh | sh -s -- --yes
 ```
 
 The bootstrap script clones or updates the repo, then runs `install.sh`.
