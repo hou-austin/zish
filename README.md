@@ -109,8 +109,9 @@ The future installer should follow this order:
 4. Back up every path that may be changed.
 5. Install required dependencies when allowed.
 6. Install or link Zish-managed configuration, themes, and plugins.
-7. Verify that Zsh starts successfully.
-8. Write install state so future runs can update or roll back safely.
+7. On Linux and WSL, set the user's login shell to Zsh when it is not already Zsh.
+8. Verify that Zsh starts successfully.
+9. Write install state so future runs can update or roll back safely.
 
 The planned user interface is documented in [docs/installation.md](docs/installation.md).
 

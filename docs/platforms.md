@@ -79,6 +79,10 @@ command -v zsh
 
 If `zsh` is missing, the installer should propose a package manager action when package installation is allowed. Changing the user's login shell with `chsh` should require explicit confirmation.
 
+On Linux and WSL, installation should make Zsh the user's login shell when the current login shell is not already Zsh. The generated setup plan must show the current shell and target shell before applying the change. Interactive installs use the normal plan confirmation; non-interactive installs require `--yes`.
+
+The target shell should be discovered with `command -v zsh`, but the installer should prefer a usable Zsh path that is present in `/etc/shells` when that file exists. If Zsh is not available until package installation completes, the installer may defer target path resolution until after packages are installed. If the resolved Zsh path is not listed in `/etc/shells`, the installer should stop and report the manual `/etc/shells` and `chsh` steps instead of guessing.
+
 ## Package Manager Safety
 
 Package-manager actions should:

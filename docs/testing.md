@@ -39,6 +39,9 @@ Installer tests should eventually cover:
 - Rollback after successful install.
 - Missing modern CLI tools with package installation enabled.
 - Missing modern CLI tools with `--no-package-install`.
+- Linux login shell already set to Zsh.
+- Linux login shell changed to Zsh after confirmation.
+- Linux login shell change blocked because the target Zsh path is missing from `/etc/shells`.
 
 ## Priority Checks
 
@@ -93,6 +96,7 @@ Until automated coverage exists, implementation changes should document:
 - Starting shell file state.
 - Files changed.
 - Backup location.
+- Login shell before and after when Linux or WSL behavior is touched.
 - Result of re-running the installer.
 
 Manual verification is not a replacement for tests, but it is better than undocumented installer changes.

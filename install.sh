@@ -120,6 +120,54 @@ zish_install_jetbrains_mono_linux() {
   rm -rf "$tmp_dir"
 }
 
+zish_current_user() {
+  id -un 2>/dev/null || printf '%s\n' "${USER:-}"
+}
+
+zish_current_login_shell() {
+  login_user=$(zish_current_user)
+  [ -n "$login_user" ] || return 1
+
+  if command -v getent >/dev/null 2>&1; then
+    getent passwd "$login_user" | awk -F: '{ print $7; exit }'
+  elif [ -r /etc/passwd ]; then
+    awk -F: -v login_user="$login_user" '$1 == login_user { print $7; exit }' /etc/passwd
+  else
+    return 1
+  fi
+}
+
+zish_shell_basename_is_zsh() {
+  case "$(basename -- "$1")" in
+    zsh) return 0 ;;
+    *) return 1 ;;
+  esac
+}
+
+zish_shell_is_listed() {
+  [ ! -r /etc/shells ] && return 0
+  grep -Fx "$1" /etc/shells >/dev/null 2>&1
+}
+
+zish_login_zsh_path() {
+  zsh_command=$(command -v zsh 2>/dev/null) || return 1
+
+  if zish_shell_is_listed "$zsh_command"; then
+    printf '%s\n' "$zsh_command"
+    return 0
+  fi
+
+  if [ -r /etc/shells ]; then
+    zsh_shell=$(awk '/^\// && /\/zsh$/ { print; exit }' /etc/shells)
+    if [ -n "$zsh_shell" ] && [ -x "$zsh_shell" ]; then
+      printf '%s\n' "$zsh_shell"
+      return 0
+    fi
+  fi
+
+  printf '%s\n' "$zsh_command"
+}
+
 zish_configure_apple_terminal_font() {
   osascript <<'APPLESCRIPT'
 tell application "Terminal"
@@ -189,6 +237,38 @@ case "$(uname -s)" in
     ;;
   *)
     TERMINAL_FONT_NOTE="set your terminal profile font to $TERMINAL_FONT_NAME"
+    ;;
+esac
+
+LOGIN_SHELL_ACTION=none
+LOGIN_SHELL_NOTE=""
+LOGIN_SHELL_USER=""
+LOGIN_SHELL_BEFORE=""
+LOGIN_SHELL_TARGET=""
+
+case "$(uname -s)" in
+  Linux)
+    LOGIN_SHELL_USER=$(zish_current_user)
+    LOGIN_SHELL_BEFORE=$(zish_current_login_shell || true)
+    if [ -z "$LOGIN_SHELL_USER" ]; then
+      LOGIN_SHELL_NOTE="could not determine current user; set login shell manually"
+    elif [ -n "$LOGIN_SHELL_BEFORE" ] && zish_shell_basename_is_zsh "$LOGIN_SHELL_BEFORE"; then
+      LOGIN_SHELL_NOTE="already zsh ($LOGIN_SHELL_BEFORE)"
+    elif ! command -v chsh >/dev/null 2>&1; then
+      LOGIN_SHELL_NOTE="chsh not found; set login shell manually after install"
+    elif LOGIN_SHELL_TARGET=$(zish_login_zsh_path); then
+      if zish_shell_is_listed "$LOGIN_SHELL_TARGET"; then
+        LOGIN_SHELL_ACTION=change
+        LOGIN_SHELL_NOTE="${LOGIN_SHELL_BEFORE:-unknown} -> $LOGIN_SHELL_TARGET"
+      else
+        LOGIN_SHELL_NOTE="$LOGIN_SHELL_TARGET is not listed in /etc/shells; add it before changing the login shell"
+      fi
+    elif [ "$NO_PACKAGE_INSTALL" -eq 0 ] && printf '%s\n' "$PACKAGES" | grep -Eq '(^| )zsh( |$)'; then
+      LOGIN_SHELL_ACTION=change-after-install
+      LOGIN_SHELL_NOTE="${LOGIN_SHELL_BEFORE:-unknown} -> zsh after package install"
+    else
+      LOGIN_SHELL_NOTE="zsh not found; install zsh before changing the login shell"
+    fi
     ;;
 esac
 
@@ -290,6 +370,10 @@ else
 fi
 printf '  terminal font: %s\n' "$TERMINAL_FONT_NOTE"
 
+if [ -n "$LOGIN_SHELL_NOTE" ]; then
+  printf '  login shell: %s\n' "$LOGIN_SHELL_NOTE"
+fi
+
 if [ -n "$UNSUPPORTED_TOOLS" ]; then
   printf '  unsupported by detected package manager: %s\n' "$UNSUPPORTED_TOOLS"
 fi
@@ -371,8 +455,32 @@ case "$TERMINAL_FONT_ACTION" in
     ;;
 esac
 
-if [ -f "$ZSHRC" ] || zish_install_tree_needed; then
+case "$LOGIN_SHELL_ACTION" in
+  change|change-after-install)
+    LOGIN_SHELL_TARGET=$(zish_login_zsh_path)
+    if ! zish_shell_is_listed "$LOGIN_SHELL_TARGET"; then
+      printf 'Cannot change login shell to %s because it is not listed in /etc/shells.\n' "$LOGIN_SHELL_TARGET" >&2
+      printf 'Add it to /etc/shells, then run: chsh -s %s %s\n' "$LOGIN_SHELL_TARGET" "$LOGIN_SHELL_USER" >&2
+      exit 1
+    fi
+    chsh -s "$LOGIN_SHELL_TARGET" "$LOGIN_SHELL_USER"
+    LOGIN_SHELL_ACTION=changed
+    ;;
+esac
+
+if [ -f "$ZSHRC" ] || zish_install_tree_needed || [ "$LOGIN_SHELL_ACTION" = changed ]; then
   mkdir -p "$BACKUP_DIR"
+fi
+
+if [ "$LOGIN_SHELL_ACTION" = changed ]; then
+  {
+    printf 'timestamp=%s\n' "$STAMP"
+    printf 'source=%s\n' "$SOURCE_ROOT"
+    printf 'user=%s\n' "$LOGIN_SHELL_USER"
+    printf 'previous_shell=%s\n' "$LOGIN_SHELL_BEFORE"
+    printf 'new_shell=%s\n' "$LOGIN_SHELL_TARGET"
+    printf 'action=change-login-shell\n'
+  } >> "$BACKUP_DIR/manifest.env"
 fi
 
 if [ -f "$ZSHRC" ]; then
@@ -384,7 +492,7 @@ if [ -f "$ZSHRC" ]; then
     printf 'path=%s\n' "$ZSHRC"
     printf 'backup=%s/.zshrc\n' "$BACKUP_DIR"
     printf 'action=update-managed-zshrc-block\n'
-  } > "$BACKUP_DIR/manifest.env"
+  } >> "$BACKUP_DIR/manifest.env"
 fi
 
 if zish_install_tree_needed && [ -d "$INSTALL_ROOT" ]; then

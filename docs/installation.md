@@ -112,12 +112,13 @@ $HOME/.local/share/zish/current
 3. Check Starship availability when the selected prompt theme requires it.
 4. Check modern CLI tool availability: `eza`, `bat`, `ripgrep`, `difftastic`, `fzf`, `zoxide`, and `atuin`.
 5. Check JetBrainsMono Nerd Font availability and terminal profile configuration support.
-6. Inventory existing shell paths.
-7. Show proposed changes, including backups and managed source blocks.
-8. Ask for confirmation.
-9. Apply changes.
-10. Run verification.
-11. Print next steps.
+6. On Linux and WSL, check the current login shell and plan a `chsh` change to Zsh when the user is not already using Zsh.
+7. Inventory existing shell paths.
+8. Show proposed changes, including backups, managed source blocks, dependency installs, and login-shell changes.
+9. Ask for confirmation.
+10. Apply changes.
+11. Run verification.
+12. Print next steps.
 
 ## Planned Flags
 
@@ -163,6 +164,7 @@ An install is successful when:
 - Existing affected paths have backups or are confirmed to be already managed.
 - Managed startup hooks are present exactly once.
 - Selected theme and plugins are installed or intentionally skipped.
+- On Linux and WSL, the user's login shell is already Zsh or has been changed to an approved Zsh path.
 - Zsh starts and sources the managed entrypoint without errors.
 - Starship can parse the selected theme when a Starship theme is enabled.
 - Managed tool configuration loads without errors.

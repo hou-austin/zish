@@ -64,6 +64,8 @@ Every install run that changes files should create a manifest. The manifest shou
 
 Use structured data. Do not rely on prose logs as the only rollback source.
 
+Login-shell changes should also be recorded in the manifest with the affected user, previous shell, new shell, and action. The previous shell value is the rollback reference because the shell database is managed by the operating system rather than by a user-owned file in the repository.
+
 ## Backup Location
 
 Default backup locations should follow platform conventions:
@@ -92,6 +94,7 @@ Rollback should:
 - Refuse to overwrite files that changed after the backup unless the user explicitly approves.
 - Remove managed blocks cleanly.
 - Restore symlinks as symlinks, directories as directories, and regular files as files.
+- Restore the previous login shell with `chsh` when a manifest records a Zish login-shell change and the previous shell is still valid.
 - Report manual steps when automatic restore is unsafe.
 
 ## Migration Scenarios
