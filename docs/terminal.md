@@ -24,7 +24,7 @@ Set `ZISH_CONFIGURE_TERMINAL_FONT=0` to skip automatic Apple Terminal font confi
 
 The Blue Owl Starship powerline uses terminal-background cutouts. Zish detects system light/dark appearance on macOS and GNOME desktops, selects the matching Starship config for the managed theme, and sets a matching cutout RGB value.
 
-If the terminal profile does not follow the system appearance, set `ZISH_SYSTEM_APPEARANCE=light` or `ZISH_SYSTEM_APPEARANCE=dark` in `config/local.zsh`. If the profile uses a custom background color, set `ZISH_TERMINAL_BACKGROUND_RGB` to the exact `R;G;B` value, or override `ZISH_TERMINAL_LIGHT_BACKGROUND_RGB` and `ZISH_TERMINAL_DARK_BACKGROUND_RGB`.
+If the terminal profile does not follow the system appearance, set `ZISH_SYSTEM_APPEARANCE=light` or `ZISH_SYSTEM_APPEARANCE=dark` in `config/local.zsh`. If the profile uses a custom background color, set `ZISH_TERMINAL_BACKGROUND_RGB` to the exact `R;G;B` value, or override `ZISH_TERMINAL_LIGHT_BACKGROUND_RGB` and `ZISH_TERMINAL_DARK_BACKGROUND_RGB`. For non-default background colors, Zish writes a cached Starship config with the matching palette color under the user cache directory.
 
 ## Cursor
 

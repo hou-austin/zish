@@ -23,6 +23,89 @@ _zish_theme="${ZISH_THEME:-blue-owl-starship}"
 _zish_starship_config_custom=0
 _zish_starship_refresh_enabled=0
 
+_zish_rgb_to_hex() {
+  emulate -L zsh
+
+  local _zish_rgb="${1:-}"
+  local -a _zish_rgb_parts
+  local _zish_rgb_part
+  local -a _zish_rgb_values
+
+  _zish_rgb_parts=("${(@s:;:)_zish_rgb}")
+  [[ "${#_zish_rgb_parts[@]}" -eq 3 ]] || return 1
+
+  for _zish_rgb_part in "${_zish_rgb_parts[@]}"; do
+    [[ "$_zish_rgb_part" == <-> ]] || return 1
+    _zish_rgb_values+=("$(( 10#$_zish_rgb_part ))")
+    (( _zish_rgb_values[-1] >= 0 && _zish_rgb_values[-1] <= 255 )) || return 1
+  done
+
+  printf '#%02X%02X%02X\n' "${_zish_rgb_values[@]}"
+}
+
+_zish_starship_config_with_terminal_bg() {
+  emulate -L zsh
+
+  local _zish_config_source="$1"
+  local _zish_terminal_bg_hex
+  local _zish_default_terminal_bg_hex
+  local _zish_cache_root
+  local _zish_terminal_bg_name
+  local _zish_config_cache
+  local _zish_config_tmp
+  local _zish_config_line
+
+  [[ -n "${ZISH_TERMINAL_BACKGROUND_RGB:-}" ]] || {
+    print -r -- "$_zish_config_source"
+    return 0
+  }
+
+  _zish_terminal_bg_hex="$(_zish_rgb_to_hex "$ZISH_TERMINAL_BACKGROUND_RGB" 2>/dev/null)" || {
+    print -r -- "$_zish_config_source"
+    return 0
+  }
+
+  case "$_zish_config_source" in
+    *starship-light.toml) _zish_default_terminal_bg_hex="#FAFAFA" ;;
+    *) _zish_default_terminal_bg_hex="#13171D" ;;
+  esac
+
+  if [[ "$_zish_terminal_bg_hex" = "$_zish_default_terminal_bg_hex" ]]; then
+    print -r -- "$_zish_config_source"
+    return 0
+  fi
+
+  _zish_cache_root="${XDG_CACHE_HOME:-$HOME/.cache}/zish/starship"
+  _zish_terminal_bg_name="${_zish_terminal_bg_hex#\#}"
+  _zish_config_cache="$_zish_cache_root/${_zish_config_source:t:r}-$_zish_terminal_bg_name.toml"
+
+  if [[ ! -r "$_zish_config_cache" || "$_zish_config_source" -nt "$_zish_config_cache" ]]; then
+    mkdir -p "$_zish_cache_root" 2>/dev/null || {
+      print -r -- "$_zish_config_source"
+      return 0
+    }
+
+    _zish_config_tmp="$_zish_config_cache.tmp.$$"
+    while IFS= read -r _zish_config_line || [[ -n "$_zish_config_line" ]]; do
+      case "$_zish_config_line" in
+        'terminal_bg = '*)
+          print -r -- "terminal_bg = \"$_zish_terminal_bg_hex\""
+          ;;
+        *)
+          print -r -- "$_zish_config_line"
+          ;;
+      esac
+    done <"$_zish_config_source" >"$_zish_config_tmp" && mv "$_zish_config_tmp" "$_zish_config_cache"
+    rm -f "$_zish_config_tmp" 2>/dev/null || true
+  fi
+
+  if [[ -r "$_zish_config_cache" ]]; then
+    print -r -- "$_zish_config_cache"
+  else
+    print -r -- "$_zish_config_source"
+  fi
+}
+
 if [[ -n "${ZISH_STARSHIP_CONFIG:-}" ]]; then
   _zish_starship_config="$ZISH_STARSHIP_CONFIG"
   _zish_starship_config_custom=1
@@ -43,6 +126,10 @@ _zish_refresh_starship_config() {
       _zish_managed_config="$_zish_light_config"
     fi
     unset _zish_light_config
+  fi
+
+  if [[ "$_zish_managed_theme" = blue-owl-starship ]]; then
+    _zish_managed_config="$(_zish_starship_config_with_terminal_bg "$_zish_managed_config")"
   fi
 
   if [[ -r "$_zish_managed_config" ]]; then

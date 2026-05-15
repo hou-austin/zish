@@ -51,8 +51,8 @@ Intentional differences:
 - No decorative marker before the aligned right section.
 - No powerline separator between the user/hostname section and the time section.
 - Color differences separate the aligned right-side sections.
-- The path segment uses `themes/blue-owl-starship/render-path.sh` because Starship's built-in directory module cannot render the Oh My Posh-style spaced folder separators inside one colored block.
-- The leading path diamond is rendered as a negative-space cutout cell: terminal-background foreground on a blue background. Zish detects light and dark system appearance for the default cutout color. Set `ZISH_TERMINAL_BACKGROUND_RGB` when the terminal background differs from the detected default.
+- The path segment uses `themes/blue-owl-starship/render-path.sh` to return plain visible path text with Oh My Posh-style spaced folder separators. Starship owns the segment styling so width calculation remains stable for the fill-aligned right section on local and SSH sessions.
+- The leading path diamond is rendered as a negative-space cutout cell: terminal-background foreground on a blue background. Zish detects light and dark system appearance for the default cutout color. Set `ZISH_TERMINAL_BACKGROUND_RGB` when the terminal background differs from the detected default; Zish will use a cached generated Starship config with the matching palette color.
 - The left-side root/sudo marker is not enabled by default because the Starship sudo module adds measurable prompt latency when it renders nothing.
 
 ## Appearance Overrides

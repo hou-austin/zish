@@ -101,9 +101,8 @@ repo_root_style = "fg:white bg:blue"
 
 [custom.blue_owl_path]
 when = true
-command = 'sh "$(dirname "$STARSHIP_CONFIG")/render-path.sh"'
-format = "$output"
-unsafe_no_escape = true
+command = 'if [ -n "${ZISH_ROOT:-}" ] && [ -r "$ZISH_ROOT/themes/blue-owl-starship/render-path.sh" ]; then sh "$ZISH_ROOT/themes/blue-owl-starship/render-path.sh"; else sh "$(dirname "$STARSHIP_CONFIG")/render-path.sh"; fi'
+format = "[](fg:terminal_bg bg:blue)[ $output ](fg:white bg:blue)[](fg:blue)"
 shell = ["sh"]
 
 [git_branch]
