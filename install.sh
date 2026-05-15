@@ -245,6 +245,23 @@ LOGIN_SHELL_NOTE=""
 LOGIN_SHELL_USER=""
 LOGIN_SHELL_BEFORE=""
 LOGIN_SHELL_TARGET=""
+LOGIN_SHELL_ERROR=""
+
+zish_print_login_shell_manual_step() {
+  target_shell="$1"
+  target_user="$2"
+
+  [ -n "$target_shell" ] || return 0
+
+  if [ -n "$target_user" ]; then
+    printf 'To make Zsh your login shell, run: chsh -s %s %s\n' "$target_shell" "$target_user" >&2
+    if command -v sudo >/dev/null 2>&1; then
+      printf 'If your system requires administrator privileges, run: sudo chsh -s %s %s\n' "$target_shell" "$target_user" >&2
+    fi
+  else
+    printf 'To make Zsh your login shell, run: chsh -s %s "$USER"\n' "$target_shell" >&2
+  fi
+}
 
 case "$(uname -s)" in
   Linux)
@@ -372,6 +389,11 @@ printf '  terminal font: %s\n' "$TERMINAL_FONT_NOTE"
 
 if [ -n "$LOGIN_SHELL_NOTE" ]; then
   printf '  login shell: %s\n' "$LOGIN_SHELL_NOTE"
+  if [ "$LOGIN_SHELL_ACTION" = change ] && [ -n "$LOGIN_SHELL_TARGET" ]; then
+    printf '  login shell command: chsh -s %s %s\n' "$LOGIN_SHELL_TARGET" "$LOGIN_SHELL_USER"
+  elif [ "$LOGIN_SHELL_ACTION" = change-after-install ]; then
+    printf '  login shell command: resolve zsh after package install, then chsh\n'
+  fi
 fi
 
 if [ -n "$UNSUPPORTED_TOOLS" ]; then
@@ -455,32 +477,8 @@ case "$TERMINAL_FONT_ACTION" in
     ;;
 esac
 
-case "$LOGIN_SHELL_ACTION" in
-  change|change-after-install)
-    LOGIN_SHELL_TARGET=$(zish_login_zsh_path)
-    if ! zish_shell_is_listed "$LOGIN_SHELL_TARGET"; then
-      printf 'Cannot change login shell to %s because it is not listed in /etc/shells.\n' "$LOGIN_SHELL_TARGET" >&2
-      printf 'Add it to /etc/shells, then run: chsh -s %s %s\n' "$LOGIN_SHELL_TARGET" "$LOGIN_SHELL_USER" >&2
-      exit 1
-    fi
-    chsh -s "$LOGIN_SHELL_TARGET" "$LOGIN_SHELL_USER"
-    LOGIN_SHELL_ACTION=changed
-    ;;
-esac
-
-if [ -f "$ZSHRC" ] || zish_install_tree_needed || [ "$LOGIN_SHELL_ACTION" = changed ]; then
+if [ -f "$ZSHRC" ] || zish_install_tree_needed; then
   mkdir -p "$BACKUP_DIR"
-fi
-
-if [ "$LOGIN_SHELL_ACTION" = changed ]; then
-  {
-    printf 'timestamp=%s\n' "$STAMP"
-    printf 'source=%s\n' "$SOURCE_ROOT"
-    printf 'user=%s\n' "$LOGIN_SHELL_USER"
-    printf 'previous_shell=%s\n' "$LOGIN_SHELL_BEFORE"
-    printf 'new_shell=%s\n' "$LOGIN_SHELL_TARGET"
-    printf 'action=change-login-shell\n'
-  } >> "$BACKUP_DIR/manifest.env"
 fi
 
 if [ -f "$ZSHRC" ]; then
@@ -553,4 +551,49 @@ if command -v starship >/dev/null 2>&1; then
   TERM=xterm-256color STARSHIP_CONFIG="$INSTALL_ROOT/themes/blue-owl-starship/starship.toml" starship print-config >/dev/null
 fi
 
+case "$LOGIN_SHELL_ACTION" in
+  change|change-after-install)
+    if LOGIN_SHELL_TARGET=$(zish_login_zsh_path); then
+      if ! zish_shell_is_listed "$LOGIN_SHELL_TARGET"; then
+        printf 'Cannot change login shell to %s because it is not listed in /etc/shells.\n' "$LOGIN_SHELL_TARGET" >&2
+        printf 'Add it to /etc/shells first.\n' >&2
+        zish_print_login_shell_manual_step "$LOGIN_SHELL_TARGET" "$LOGIN_SHELL_USER"
+        exit 1
+      elif chsh -s "$LOGIN_SHELL_TARGET" "$LOGIN_SHELL_USER"; then
+        LOGIN_SHELL_ACTION=changed
+      else
+        LOGIN_SHELL_ACTION=manual
+        LOGIN_SHELL_ERROR="chsh exited without changing the login shell"
+        printf 'Zish installed, but the login shell was not changed automatically.\n' >&2
+        zish_print_login_shell_manual_step "$LOGIN_SHELL_TARGET" "$LOGIN_SHELL_USER"
+      fi
+    else
+      printf 'Zish installed, but no usable zsh path was found for the login shell change.\n' >&2
+      exit 1
+    fi
+    ;;
+esac
+
+case "$LOGIN_SHELL_ACTION" in
+  changed|manual)
+    mkdir -p "$BACKUP_DIR"
+    {
+      printf 'timestamp=%s\n' "$STAMP"
+      printf 'source=%s\n' "$SOURCE_ROOT"
+      printf 'user=%s\n' "$LOGIN_SHELL_USER"
+      printf 'previous_shell=%s\n' "$LOGIN_SHELL_BEFORE"
+      printf 'new_shell=%s\n' "$LOGIN_SHELL_TARGET"
+      if [ "$LOGIN_SHELL_ACTION" = changed ]; then
+        printf 'action=change-login-shell\n'
+      else
+        printf 'action=change-login-shell-manual\n'
+        printf 'error=%s\n' "$LOGIN_SHELL_ERROR"
+      fi
+    } >> "$BACKUP_DIR/manifest.env"
+    ;;
+esac
+
 printf 'Zish setup complete.\n'
+if [ "$LOGIN_SHELL_ACTION" = manual ] && [ -n "$LOGIN_SHELL_TARGET" ]; then
+  printf 'Login shell still needs manual change: chsh -s %s %s\n' "$LOGIN_SHELL_TARGET" "$LOGIN_SHELL_USER"
+fi

@@ -64,7 +64,7 @@ Every install run that changes files should create a manifest. The manifest shou
 
 Use structured data. Do not rely on prose logs as the only rollback source.
 
-Login-shell changes should also be recorded in the manifest with the affected user, previous shell, new shell, and action. The previous shell value is the rollback reference because the shell database is managed by the operating system rather than by a user-owned file in the repository.
+Login-shell changes should also be recorded in the manifest with the affected user, previous shell, new shell, and action. If the automatic `chsh` attempt fails and setup leaves a manual follow-up, record that as a manual login-shell action rather than as a completed shell change. The previous shell value is the rollback reference because the shell database is managed by the operating system rather than by a user-owned file in the repository.
 
 ## Backup Location
 

@@ -116,9 +116,10 @@ $HOME/.local/share/zish/current
 7. Inventory existing shell paths.
 8. Show proposed changes, including backups, managed source blocks, dependency installs, and login-shell changes.
 9. Ask for confirmation.
-10. Apply changes.
+10. Apply file, package, and terminal changes.
 11. Run verification.
-12. Print next steps.
+12. Attempt the login-shell change when planned.
+13. Print next steps.
 
 ## Planned Flags
 
@@ -164,7 +165,7 @@ An install is successful when:
 - Existing affected paths have backups or are confirmed to be already managed.
 - Managed startup hooks are present exactly once.
 - Selected theme and plugins are installed or intentionally skipped.
-- On Linux and WSL, the user's login shell is already Zsh or has been changed to an approved Zsh path.
+- On Linux and WSL, the user's login shell is already Zsh, has been changed to an approved Zsh path, or the installer reported the exact manual command after an authentication or policy failure.
 - Zsh starts and sources the managed entrypoint without errors.
 - Starship can parse the selected theme when a Starship theme is enabled.
 - Managed tool configuration loads without errors.
