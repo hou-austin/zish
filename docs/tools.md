@@ -18,6 +18,8 @@ Zish includes first-class integration for modern command-line tools that improve
 
 `install.sh` checks for these tools during setup. When package installation is allowed, it installs missing tools through the detected package manager when the package name is known.
 
+If an existing `.zshrc` already initializes `fzf`, `zoxide`, or `atuin`, the installer reports that in the setup plan and writes the matching Zish opt-out variable into the managed block. This preserves the user's existing integration and avoids loading the same tool integration twice.
+
 Current package-manager mapping:
 
 | Manager | Packages |

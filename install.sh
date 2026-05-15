@@ -299,8 +299,17 @@ STAMP=$(date +%Y%m%d-%H%M%S)
 BACKUP_DIR="$BACKUP_ROOT/$STAMP"
 ZSHRC="$HOME/.zshrc"
 EXISTING_SYNTAX_HIGHLIGHTING=0
-if [ -f "$ZSHRC" ] && grep -Eq '^# Syntax highlighting should be last$|zsh-syntax-highlighting' "$ZSHRC"; then
-  EXISTING_SYNTAX_HIGHLIGHTING=1
+EXISTING_AUTOSUGGESTIONS=0
+EXISTING_FZF=0
+EXISTING_ZOXIDE=0
+EXISTING_ATUIN=0
+
+if [ -f "$ZSHRC" ]; then
+  grep -Eq '^# Syntax highlighting should be last$|zsh-syntax-highlighting' "$ZSHRC" && EXISTING_SYNTAX_HIGHLIGHTING=1 || true
+  grep -Eq 'zsh-autosuggestions' "$ZSHRC" && EXISTING_AUTOSUGGESTIONS=1 || true
+  grep -Eq 'fzf[[:space:]]+--zsh|source[[:space:]].*fzf\.zsh' "$ZSHRC" && EXISTING_FZF=1 || true
+  grep -Eq 'zoxide[[:space:]]+init' "$ZSHRC" && EXISTING_ZOXIDE=1 || true
+  grep -Eq 'atuin[[:space:]]+init' "$ZSHRC" && EXISTING_ATUIN=1 || true
 fi
 
 zish_same_path() {
@@ -342,21 +351,36 @@ zish_sync_install_tree() {
   done
 }
 
+_zish_managed_disables=""
 if [ "$EXISTING_SYNTAX_HIGHLIGHTING" -eq 1 ]; then
-  MANAGED_BLOCK="# >>> zish managed block >>>
-# Existing syntax highlighting is left after this block so it remains last.
+  _zish_managed_disables="${_zish_managed_disables}# Existing syntax highlighting is left after this block so it remains last.
 export ZISH_DISABLE_ZSH_SYNTAX_HIGHLIGHTING=1
-if [ -f \"$INSTALL_ROOT/config/init.zsh\" ]; then
+"
+fi
+if [ "$EXISTING_AUTOSUGGESTIONS" -eq 1 ]; then
+  _zish_managed_disables="${_zish_managed_disables}export ZISH_DISABLE_ZSH_AUTOSUGGESTIONS=1
+"
+fi
+if [ "$EXISTING_FZF" -eq 1 ]; then
+  _zish_managed_disables="${_zish_managed_disables}export ZISH_DISABLE_FZF_INTEGRATION=1
+"
+fi
+if [ "$EXISTING_ZOXIDE" -eq 1 ]; then
+  _zish_managed_disables="${_zish_managed_disables}export ZISH_DISABLE_ZOXIDE_INTEGRATION=1
+"
+fi
+if [ "$EXISTING_ATUIN" -eq 1 ]; then
+  _zish_managed_disables="${_zish_managed_disables}export ZISH_DISABLE_ATUIN_INTEGRATION=1
+"
+fi
+
+MANAGED_BLOCK="# >>> zish managed block >>>
+${_zish_managed_disables}if [ -f \"$INSTALL_ROOT/config/init.zsh\" ]; then
   source \"$INSTALL_ROOT/config/init.zsh\"
 fi
 # <<< zish managed block <<<"
-else
-  MANAGED_BLOCK="# >>> zish managed block >>>
-if [ -f \"$INSTALL_ROOT/config/init.zsh\" ]; then
-  source \"$INSTALL_ROOT/config/init.zsh\"
-fi
-# <<< zish managed block <<<"
-fi
+
+unset _zish_managed_disables
 
 printf 'Zish setup plan\n'
 printf '  source: %s\n' "$SOURCE_ROOT"
@@ -431,6 +455,18 @@ fi
 
 if [ "$EXISTING_SYNTAX_HIGHLIGHTING" -eq 1 ]; then
   printf '  note: zsh-syntax-highlighting detected; managed block will be inserted before it\n'
+fi
+if [ "$EXISTING_AUTOSUGGESTIONS" -eq 1 ]; then
+  printf '  note: existing zsh-autosuggestions detected; Zish plugin disabled to avoid double-loading\n'
+fi
+if [ "$EXISTING_FZF" -eq 1 ]; then
+  printf '  note: existing fzf integration detected; Zish fzf disabled to avoid double-loading\n'
+fi
+if [ "$EXISTING_ZOXIDE" -eq 1 ]; then
+  printf '  note: existing zoxide integration detected; Zish zoxide disabled to avoid double-loading\n'
+fi
+if [ "$EXISTING_ATUIN" -eq 1 ]; then
+  printf '  note: existing atuin integration detected; Zish atuin disabled to avoid double-loading\n'
 fi
 
 if [ "$DRY_RUN" -eq 1 ]; then

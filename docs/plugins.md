@@ -13,6 +13,8 @@ The current implementation loads package-managed Zsh plugins from `config/plugin
 
 `install.sh` checks for both plugin packages and installs them through the detected package manager when package installation is allowed and the package name is known.
 
+If an existing `.zshrc` already loads `zsh-autosuggestions` or `zsh-syntax-highlighting`, the installer preserves that setup and writes opt-out variables into the Zish managed block so those plugins are not loaded twice.
+
 Current package-manager mapping:
 
 | Manager | Packages |
