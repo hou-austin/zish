@@ -3,7 +3,6 @@ set -eu
 
 blue='1;87;155'
 white='255;255;255'
-black='0;0;0'
 terminal_bg="${ZISH_TERMINAL_BACKGROUND_RGB:-19;23;29}"
 
 fg() {
@@ -51,7 +50,7 @@ printf ' '
 first=1
 for component in "$@"; do
   if [ "$first" -eq 0 ]; then
-    fg_bg "$black" "$blue"
+    fg_bg "$terminal_bg" "$blue"
     printf '  '
     fg_bg "$white" "$blue"
   fi

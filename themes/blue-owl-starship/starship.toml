@@ -36,6 +36,7 @@ clock_green = "#3EC669"
 root_purple = "#A313A8"
 white = "#FFFFFF"
 black = "#000000"
+terminal_bg = "#13171D"
 
 [os]
 disabled = false
@@ -106,7 +107,7 @@ unsafe_no_escape = true
 shell = ["sh"]
 
 [git_branch]
-format = "[](fg:git_yellow)[ $symbol$branch(:$remote_branch) ]($style)"
+format = "[](fg:terminal_bg bg:git_yellow)[ $symbol$branch(:$remote_branch) ]($style)"
 style = "fg:black bg:git_yellow"
 symbol = ""
 truncation_length = 32
@@ -135,13 +136,13 @@ shell = ["sh"]
 
 [cmd_duration]
 min_time = 0
-format = "[](fg:duration)[ ${duration} ]($style)[ ](fg:duration)"
+format = "[](fg:terminal_bg bg:duration)[ ${duration} ]($style)[ ](fg:duration)"
 style = "fg:white bg:duration"
 show_milliseconds = false
 
 [status]
 disabled = false
-format = "[](fg:danger)[ $symbol$status ]($style)[ ](fg:danger)"
+format = "[](fg:terminal_bg bg:danger)[ $symbol$status ]($style)[ ](fg:danger)"
 style = "fg:white bg:danger"
 symbol = "! "
 not_executable_symbol = "no-exec "
