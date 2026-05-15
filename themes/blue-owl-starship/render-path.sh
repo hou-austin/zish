@@ -59,6 +59,7 @@ for component in "$@"; do
 done
 
 printf ' '
+reset
 fg "$blue"
 printf ' '
 reset
