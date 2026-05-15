@@ -1,0 +1,21 @@
+name = "blue-owl-starship"
+prompt = "starship"
+shell = "zsh"
+status = "initial"
+description = "A Starship port of the Oh My Posh blue-owl theme with angular powerline-inspired blocks."
+source_theme = "blue-owl"
+source_project = "Oh My Posh"
+source_url = "https://github.com/JanDeDobbeleer/oh-my-posh/blob/main/themes/blue-owl.omp.json"
+
+requires = [
+  "zsh",
+  "starship",
+  "nerd-font",
+]
+
+features = [
+  "left prompt with OS, directory, Git, duration, status, and character modules",
+  "right prompt with user, hostname, and 24-hour time",
+  "no decorative leading marker before the right prompt",
+  "no powerline separator between user/hostname and time",
+]
