@@ -12,6 +12,9 @@ Usage: ./install.sh [--dry-run] [--yes] [--no-package-install]
 Sets up the managed Zish hook and installs/configures supported CLI tools:
 zsh, starship, eza, bat, ripgrep, difftastic, fzf, zoxide, atuin,
 zsh-autosuggestions, and zsh-syntax-highlighting.
+
+Environment overrides:
+  ZISH_INSTALL_DIR  Managed install path. Default: $XDG_DATA_HOME/zish/current
 USAGE
 }
 
@@ -33,9 +36,21 @@ while [ "$#" -gt 0 ]; do
   shift
 done
 
-REPO_ROOT=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd -P)
+SOURCE_ROOT=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd -P)
+INSTALL_ROOT="${ZISH_INSTALL_DIR:-${XDG_DATA_HOME:-$HOME/.local/share}/zish/current}"
+INSTALL_PARENT=$(dirname -- "$INSTALL_ROOT")
+INSTALL_BASENAME=$(basename -- "$INSTALL_ROOT")
+if [ -d "$INSTALL_PARENT" ]; then
+  INSTALL_ROOT=$(CDPATH= cd -- "$INSTALL_PARENT" && printf '%s/%s\n' "$(pwd -P)" "$INSTALL_BASENAME")
+else
+  case "$INSTALL_PARENT" in
+    /*) INSTALL_ROOT="$INSTALL_PARENT/$INSTALL_BASENAME" ;;
+    *) INSTALL_ROOT="$PWD/$INSTALL_PARENT/$INSTALL_BASENAME" ;;
+  esac
+fi
+unset INSTALL_PARENT INSTALL_BASENAME
 # shellcheck source=lib/setup/packages.sh
-. "$REPO_ROOT/lib/setup/packages.sh"
+. "$SOURCE_ROOT/lib/setup/packages.sh"
 
 TOOLS="zsh starship eza bat ripgrep difftastic fzf zoxide atuin zsh-autosuggestions zsh-syntax-highlighting"
 MANAGER=$(zish_detect_package_manager)
@@ -191,24 +206,64 @@ if [ -f "$ZSHRC" ] && grep -Eq '^# Syntax highlighting should be last$|zsh-synta
   EXISTING_SYNTAX_HIGHLIGHTING=1
 fi
 
+zish_same_path() {
+  [ "$(CDPATH= cd -- "$1" 2>/dev/null && pwd -P)" = "$(CDPATH= cd -- "$2" 2>/dev/null && pwd -P)" ]
+}
+
+zish_install_tree_needed() {
+  if [ ! -d "$INSTALL_ROOT" ]; then
+    return 0
+  fi
+
+  ! zish_same_path "$SOURCE_ROOT" "$INSTALL_ROOT"
+}
+
+zish_sync_install_tree() {
+  if zish_same_path "$SOURCE_ROOT" "$INSTALL_ROOT"; then
+    return 0
+  fi
+
+  case "$INSTALL_ROOT" in
+    /|"") printf 'Refusing unsafe ZISH_INSTALL_DIR: %s\n' "$INSTALL_ROOT" >&2; exit 1 ;;
+  esac
+
+  mkdir -p "$INSTALL_ROOT"
+  rm -rf \
+    "$INSTALL_ROOT/config" \
+    "$INSTALL_ROOT/docs" \
+    "$INSTALL_ROOT/lib" \
+    "$INSTALL_ROOT/themes" \
+    "$INSTALL_ROOT/AGENTS.md" \
+    "$INSTALL_ROOT/README.md" \
+    "$INSTALL_ROOT/bootstrap.sh" \
+    "$INSTALL_ROOT/install.sh"
+
+  for path in config docs lib themes AGENTS.md README.md bootstrap.sh install.sh; do
+    if [ -e "$SOURCE_ROOT/$path" ]; then
+      cp -R "$SOURCE_ROOT/$path" "$INSTALL_ROOT/$path"
+    fi
+  done
+}
+
 if [ "$EXISTING_SYNTAX_HIGHLIGHTING" -eq 1 ]; then
   MANAGED_BLOCK="# >>> zish managed block >>>
 # Existing syntax highlighting is left after this block so it remains last.
 export ZISH_DISABLE_ZSH_SYNTAX_HIGHLIGHTING=1
-if [ -f \"$REPO_ROOT/config/init.zsh\" ]; then
-  source \"$REPO_ROOT/config/init.zsh\"
+if [ -f \"$INSTALL_ROOT/config/init.zsh\" ]; then
+  source \"$INSTALL_ROOT/config/init.zsh\"
 fi
 # <<< zish managed block <<<"
 else
   MANAGED_BLOCK="# >>> zish managed block >>>
-if [ -f \"$REPO_ROOT/config/init.zsh\" ]; then
-  source \"$REPO_ROOT/config/init.zsh\"
+if [ -f \"$INSTALL_ROOT/config/init.zsh\" ]; then
+  source \"$INSTALL_ROOT/config/init.zsh\"
 fi
 # <<< zish managed block <<<"
 fi
 
 printf 'Zish setup plan\n'
-printf '  repo: %s\n' "$REPO_ROOT"
+printf '  source: %s\n' "$SOURCE_ROOT"
+printf '  install dir: %s\n' "$INSTALL_ROOT"
 printf '  shell hook: %s\n' "$ZSHRC"
 printf '  package manager: %s\n' "$MANAGER"
 
@@ -243,6 +298,17 @@ if [ -f "$ZSHRC" ]; then
   printf '  backup: %s/.zshrc\n' "$BACKUP_DIR"
 else
   printf '  backup: not needed; %s does not exist\n' "$ZSHRC"
+fi
+
+if zish_install_tree_needed; then
+  if [ -d "$INSTALL_ROOT" ]; then
+    printf '  install backup: %s/install-root\n' "$BACKUP_DIR"
+  else
+    printf '  install backup: not needed; %s does not exist\n' "$INSTALL_ROOT"
+  fi
+  printf '  install files: sync managed files to %s\n' "$INSTALL_ROOT"
+else
+  printf '  install files: source is already the install dir\n'
 fi
 
 if [ -f "$ZSHRC" ] && grep -Eq 'starship[[:space:]]+init[[:space:]]+zsh|starship init zsh' "$ZSHRC"; then
@@ -305,17 +371,34 @@ case "$TERMINAL_FONT_ACTION" in
     ;;
 esac
 
-if [ -f "$ZSHRC" ]; then
+if [ -f "$ZSHRC" ] || zish_install_tree_needed; then
   mkdir -p "$BACKUP_DIR"
+fi
+
+if [ -f "$ZSHRC" ]; then
   cp "$ZSHRC" "$BACKUP_DIR/.zshrc"
   {
     printf 'timestamp=%s\n' "$STAMP"
-    printf 'repo=%s\n' "$REPO_ROOT"
+    printf 'source=%s\n' "$SOURCE_ROOT"
+    printf 'install=%s\n' "$INSTALL_ROOT"
     printf 'path=%s\n' "$ZSHRC"
     printf 'backup=%s/.zshrc\n' "$BACKUP_DIR"
     printf 'action=update-managed-zshrc-block\n'
   } > "$BACKUP_DIR/manifest.env"
 fi
+
+if zish_install_tree_needed && [ -d "$INSTALL_ROOT" ]; then
+  cp -R "$INSTALL_ROOT" "$BACKUP_DIR/install-root"
+  {
+    printf 'timestamp=%s\n' "$STAMP"
+    printf 'source=%s\n' "$SOURCE_ROOT"
+    printf 'install=%s\n' "$INSTALL_ROOT"
+    printf 'backup=%s/install-root\n' "$BACKUP_DIR"
+    printf 'action=sync-install-root\n'
+  } >> "$BACKUP_DIR/manifest.env"
+fi
+
+zish_sync_install_tree
 
 tmp_zshrc="${ZSHRC}.zish.tmp"
 if [ -f "$ZSHRC" ]; then
@@ -355,11 +438,11 @@ mv "${tmp_zshrc}.new" "$ZSHRC"
 rm -f "$tmp_zshrc"
 
 if command -v zsh >/dev/null 2>&1; then
-  zsh -n "$REPO_ROOT/config/init.zsh" "$REPO_ROOT/config/starship.zsh" "$REPO_ROOT/config/tools.zsh" "$REPO_ROOT/config/terminal.zsh" "$REPO_ROOT/config/plugins.zsh"
+  zsh -n "$INSTALL_ROOT/config/init.zsh" "$INSTALL_ROOT/config/starship.zsh" "$INSTALL_ROOT/config/tools.zsh" "$INSTALL_ROOT/config/terminal.zsh" "$INSTALL_ROOT/config/plugins.zsh"
 fi
 
 if command -v starship >/dev/null 2>&1; then
-  TERM=xterm-256color STARSHIP_CONFIG="$REPO_ROOT/themes/blue-owl-starship/starship.toml" starship print-config >/dev/null
+  TERM=xterm-256color STARSHIP_CONFIG="$INSTALL_ROOT/themes/blue-owl-starship/starship.toml" starship print-config >/dev/null
 fi
 
 printf 'Zish setup complete.\n'

@@ -17,7 +17,7 @@ Runtime files:
 
 For the managed `blue-owl-starship` theme, Zish selects the dark or light Starship config from the detected system appearance. It also refreshes that choice before prompts with a short cache window, so changing system appearance can update new prompt renders without running detection commands every prompt.
 
-If Starship was already initialized earlier in `.zshrc`, Zish still sets `STARSHIP_CONFIG` but skips a second `starship init zsh` call. This avoids duplicate Starship hooks while allowing the managed theme to affect future prompt renders.
+If Starship was already initialized earlier in `.zshrc`, Zish still sets `STARSHIP_CONFIG` but skips a second `starship init zsh` call when the current shell already has Starship prompt functions loaded. The check must not rely on inherited environment variables alone, because `exec zsh` preserves variables such as `STARSHIP_SHELL` while starting a fresh shell without prompt functions.
 
 ## Theme Selection
 

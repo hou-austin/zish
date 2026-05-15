@@ -62,7 +62,7 @@ fi
 
 unset _zish_theme _zish_starship_config _zish_starship_config_custom
 
-if [[ -n "${STARSHIP_SHELL:-}" ]] || (( $+functions[prompt_starship_precmd] )); then
+if (( $+functions[prompt_starship_precmd] )); then
   unset _zish_starship_refresh_enabled
   return 0
 fi

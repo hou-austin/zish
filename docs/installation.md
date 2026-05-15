@@ -24,6 +24,26 @@ Future commands:
 
 The implementation should keep the same concepts: plan, apply, verify, update, and restore.
 
+`install.sh` stages managed Zish files into a stable install directory, then writes the shell hook to source that installed copy. Running `install.sh` from a development checkout must not make `~/.zshrc` source the development checkout directly.
+
+Default install path:
+
+```text
+$XDG_DATA_HOME/zish/current
+```
+
+When `XDG_DATA_HOME` is unset, this resolves to:
+
+```text
+$HOME/.local/share/zish/current
+```
+
+Override it with:
+
+```sh
+ZISH_INSTALL_DIR=/path/to/zish ./install.sh
+```
+
 ## Curl Bootstrap
 
 Once the repository is hosted, the intended one-line setup is:
@@ -53,11 +73,18 @@ Environment overrides:
 | `ZISH_REPO_URL` | Git URL to clone. |
 | `ZISH_BRANCH` | Branch to checkout. |
 | `ZISH_DIR` | Local checkout path. |
+| `ZISH_INSTALL_DIR` | Runtime install path sourced by the managed shell hook. |
 
 Default checkout path:
 
 ```text
 $HOME/.local/share/zish/repo
+```
+
+Default runtime install path:
+
+```text
+$HOME/.local/share/zish/current
 ```
 
 ## Setup Modes
