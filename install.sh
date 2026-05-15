@@ -10,7 +10,8 @@ usage() {
 Usage: ./install.sh [--dry-run] [--yes] [--no-package-install]
 
 Sets up the managed Zish hook and installs/configures supported CLI tools:
-zsh, starship, eza, bat, ripgrep, and difftastic.
+zsh, starship, eza, bat, ripgrep, difftastic, fzf, zoxide, atuin,
+zsh-autosuggestions, and zsh-syntax-highlighting.
 USAGE
 }
 
@@ -36,7 +37,7 @@ REPO_ROOT=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd -P)
 # shellcheck source=lib/setup/packages.sh
 . "$REPO_ROOT/lib/setup/packages.sh"
 
-TOOLS="zsh starship eza bat ripgrep difftastic"
+TOOLS="zsh starship eza bat ripgrep difftastic fzf zoxide atuin zsh-autosuggestions zsh-syntax-highlighting"
 MANAGER=$(zish_detect_package_manager)
 MISSING_TOOLS=""
 PACKAGES=""
@@ -45,7 +46,11 @@ FONT_ACTION=none
 FONT_NOTE=""
 FONT_INSTALL_LABEL=""
 FONT_READY=0
-TERMINAL_FONT_NAME="MesloLGM Nerd Font Mono"
+FONT_DISPLAY_NAME="JetBrainsMono Nerd Font"
+FONT_CASK="font-jetbrains-mono-nerd-font"
+FONT_ARCHIVE="JetBrainsMono.zip"
+FONT_DIR_NAME="JetBrainsMonoNerdFont"
+TERMINAL_FONT_NAME="JetBrainsMono Nerd Font Mono"
 TERMINAL_FONT_ACTION=none
 TERMINAL_FONT_NOTE=""
 
@@ -69,29 +74,29 @@ zish_is_wsl() {
   [ -r /proc/version ] && grep -qi microsoft /proc/version
 }
 
-zish_macos_meslo_installed() {
-  if command -v brew >/dev/null 2>&1 && brew list --cask font-meslo-lg-nerd-font >/dev/null 2>&1; then
+zish_macos_jetbrains_mono_installed() {
+  if command -v brew >/dev/null 2>&1 && brew list --cask "$FONT_CASK" >/dev/null 2>&1; then
     return 0
   fi
 
-  find "$HOME/Library/Fonts" -maxdepth 1 -name 'MesloLGM*NerdFont*.ttf' 2>/dev/null | grep -q .
+  find "$HOME/Library/Fonts" -maxdepth 1 -name 'JetBrainsMono*NerdFontMono*.ttf' 2>/dev/null | grep -q .
 }
 
-zish_linux_meslo_installed() {
+zish_linux_jetbrains_mono_installed() {
   if command -v fc-match >/dev/null 2>&1; then
-    fc-match -f '%{family}\n' 'MesloLGM Nerd Font' 2>/dev/null | grep -qi 'Meslo.*Nerd Font'
+    fc-match -f '%{family}\n' "$TERMINAL_FONT_NAME" 2>/dev/null | grep -qi 'JetBrains.*Nerd Font.*Mono'
   else
-    find "${XDG_DATA_HOME:-$HOME/.local/share}/fonts" -name 'MesloLGM*NerdFont*.ttf' 2>/dev/null | grep -q .
+    find "${XDG_DATA_HOME:-$HOME/.local/share}/fonts" -name 'JetBrainsMono*NerdFontMono*.ttf' 2>/dev/null | grep -q .
   fi
 }
 
-zish_install_meslo_linux() {
+zish_install_jetbrains_mono_linux() {
   tmp_dir=$(mktemp -d)
-  font_dir="${XDG_DATA_HOME:-$HOME/.local/share}/fonts/MesloLGMNerdFont"
+  font_dir="${XDG_DATA_HOME:-$HOME/.local/share}/fonts/$FONT_DIR_NAME"
 
   mkdir -p "$font_dir"
-  curl -fsSL -o "$tmp_dir/Meslo.zip" https://github.com/ryanoasis/nerd-fonts/releases/latest/download/Meslo.zip
-  unzip -oq "$tmp_dir/Meslo.zip" -d "$font_dir"
+  curl -fsSL -o "$tmp_dir/$FONT_ARCHIVE" "https://github.com/ryanoasis/nerd-fonts/releases/latest/download/$FONT_ARCHIVE"
+  unzip -oq "$tmp_dir/$FONT_ARCHIVE" -d "$font_dir"
 
   if command -v fc-cache >/dev/null 2>&1; then
     fc-cache -f "$font_dir" >/dev/null 2>&1 || true
@@ -103,9 +108,9 @@ zish_install_meslo_linux() {
 zish_configure_apple_terminal_font() {
   osascript <<'APPLESCRIPT'
 tell application "Terminal"
-  set font name of default settings to "MesloLGM Nerd Font Mono"
+  set font name of default settings to "JetBrainsMono Nerd Font Mono"
   if (count of windows) > 0 then
-    set font name of current settings of selected tab of front window to "MesloLGM Nerd Font Mono"
+    set font name of current settings of selected tab of front window to "JetBrainsMono Nerd Font Mono"
   end if
 end tell
 APPLESCRIPT
@@ -113,37 +118,37 @@ APPLESCRIPT
 
 case "$(uname -s)" in
   Darwin)
-    if zish_macos_meslo_installed; then
-      FONT_NOTE="Meslo LGM Nerd Font is installed"
+    if zish_macos_jetbrains_mono_installed; then
+      FONT_NOTE="$FONT_DISPLAY_NAME is installed"
       FONT_READY=1
     elif [ "$NO_PACKAGE_INSTALL" -eq 1 ]; then
-      FONT_NOTE="Meslo LGM Nerd Font install skipped by --no-package-install"
+      FONT_NOTE="$FONT_DISPLAY_NAME install skipped by --no-package-install"
     elif [ "$MANAGER" = brew ]; then
       FONT_ACTION=brew-cask
-      FONT_INSTALL_LABEL="brew install --cask font-meslo-lg-nerd-font"
+      FONT_INSTALL_LABEL="brew install --cask $FONT_CASK"
       FONT_READY=1
     else
-      FONT_NOTE="install Meslo LGM Nerd Font manually and set it in your terminal"
+      FONT_NOTE="install $FONT_DISPLAY_NAME manually and set it in your terminal"
     fi
     ;;
   Linux)
     if zish_is_wsl; then
-      FONT_NOTE="WSL detected; install Meslo LGM Nerd Font on the Windows host and set it in Windows Terminal"
-    elif zish_linux_meslo_installed; then
-      FONT_NOTE="Meslo LGM Nerd Font is installed"
+      FONT_NOTE="WSL detected; install $FONT_DISPLAY_NAME on the Windows host and set it in Windows Terminal"
+    elif zish_linux_jetbrains_mono_installed; then
+      FONT_NOTE="$FONT_DISPLAY_NAME is installed"
       FONT_READY=1
     elif [ "$NO_PACKAGE_INSTALL" -eq 1 ]; then
-      FONT_NOTE="Meslo LGM Nerd Font install skipped by --no-package-install"
+      FONT_NOTE="$FONT_DISPLAY_NAME install skipped by --no-package-install"
     elif command -v curl >/dev/null 2>&1 && command -v unzip >/dev/null 2>&1; then
       FONT_ACTION=linux-user
-      FONT_INSTALL_LABEL="download Meslo.zip into ${XDG_DATA_HOME:-$HOME/.local/share}/fonts/MesloLGMNerdFont"
+      FONT_INSTALL_LABEL="download $FONT_ARCHIVE into ${XDG_DATA_HOME:-$HOME/.local/share}/fonts/$FONT_DIR_NAME"
       FONT_READY=1
     else
-      FONT_NOTE="install Meslo LGM Nerd Font manually; curl and unzip are required for automatic font install"
+      FONT_NOTE="install $FONT_DISPLAY_NAME manually; curl and unzip are required for automatic font install"
     fi
     ;;
   *)
-    FONT_NOTE="install Meslo LGM Nerd Font manually and set it in your terminal"
+    FONT_NOTE="install $FONT_DISPLAY_NAME manually and set it in your terminal"
     ;;
 esac
 
@@ -155,7 +160,7 @@ case "$(uname -s)" in
       TERMINAL_FONT_ACTION=apple-terminal
       TERMINAL_FONT_NOTE="Apple Terminal active profile -> $TERMINAL_FONT_NAME"
     elif [ "${TERM_PROGRAM:-}" = Apple_Terminal ]; then
-      TERMINAL_FONT_NOTE="Apple Terminal font not changed because Meslo LGM Nerd Font is not installed"
+      TERMINAL_FONT_NOTE="Apple Terminal font not changed because $FONT_DISPLAY_NAME is not installed"
     else
       TERMINAL_FONT_NOTE="set your terminal profile font to $TERMINAL_FONT_NAME"
     fi
@@ -181,11 +186,26 @@ fi
 STAMP=$(date +%Y%m%d-%H%M%S)
 BACKUP_DIR="$BACKUP_ROOT/$STAMP"
 ZSHRC="$HOME/.zshrc"
-MANAGED_BLOCK="# >>> zish managed block >>>
+EXISTING_SYNTAX_HIGHLIGHTING=0
+if [ -f "$ZSHRC" ] && grep -Eq '^# Syntax highlighting should be last$|zsh-syntax-highlighting' "$ZSHRC"; then
+  EXISTING_SYNTAX_HIGHLIGHTING=1
+fi
+
+if [ "$EXISTING_SYNTAX_HIGHLIGHTING" -eq 1 ]; then
+  MANAGED_BLOCK="# >>> zish managed block >>>
+# Existing syntax highlighting is left after this block so it remains last.
+export ZISH_DISABLE_ZSH_SYNTAX_HIGHLIGHTING=1
 if [ -f \"$REPO_ROOT/config/init.zsh\" ]; then
   source \"$REPO_ROOT/config/init.zsh\"
 fi
 # <<< zish managed block <<<"
+else
+  MANAGED_BLOCK="# >>> zish managed block >>>
+if [ -f \"$REPO_ROOT/config/init.zsh\" ]; then
+  source \"$REPO_ROOT/config/init.zsh\"
+fi
+# <<< zish managed block <<<"
+fi
 
 printf 'Zish setup plan\n'
 printf '  repo: %s\n' "$REPO_ROOT"
@@ -210,7 +230,7 @@ fi
 if [ "$FONT_ACTION" = none ]; then
   printf '  font: %s\n' "$FONT_NOTE"
 else
-  printf '  font: Meslo LGM Nerd Font\n'
+  printf '  font: %s\n' "$FONT_DISPLAY_NAME"
   printf '  font install: %s\n' "$FONT_INSTALL_LABEL"
 fi
 printf '  terminal font: %s\n' "$TERMINAL_FONT_NOTE"
@@ -233,7 +253,11 @@ if [ -f "$ZSHRC" ] && grep -Eq '^[[:space:]]*alias[[:space:]]+(ls|ll|la|lt|cat)=
   printf '  note: existing tool aliases detected; Zish aliases load later and may override them\n'
 fi
 
-if [ -f "$ZSHRC" ] && grep -Eq '^# Syntax highlighting should be last$|zsh-syntax-highlighting' "$ZSHRC"; then
+if [ -f "$ZSHRC" ] && grep -Eq '^[[:space:]]*(alias|function)[[:space:]]+cd[=[:space:]]|^[[:space:]]*cd[[:space:]]*\(\)' "$ZSHRC"; then
+  printf '  note: existing cd override detected; Zish zoxide integration loads later and may override it\n'
+fi
+
+if [ "$EXISTING_SYNTAX_HIGHLIGHTING" -eq 1 ]; then
   printf '  note: zsh-syntax-highlighting detected; managed block will be inserted before it\n'
 fi
 
@@ -268,10 +292,10 @@ fi
 
 case "$FONT_ACTION" in
   brew-cask)
-    brew install --cask font-meslo-lg-nerd-font
+    brew install --cask "$FONT_CASK"
     ;;
   linux-user)
-    zish_install_meslo_linux
+    zish_install_jetbrains_mono_linux
     ;;
 esac
 
@@ -331,7 +355,7 @@ mv "${tmp_zshrc}.new" "$ZSHRC"
 rm -f "$tmp_zshrc"
 
 if command -v zsh >/dev/null 2>&1; then
-  zsh -n "$REPO_ROOT/config/init.zsh" "$REPO_ROOT/config/starship.zsh" "$REPO_ROOT/config/tools.zsh" "$REPO_ROOT/config/terminal.zsh"
+  zsh -n "$REPO_ROOT/config/init.zsh" "$REPO_ROOT/config/starship.zsh" "$REPO_ROOT/config/tools.zsh" "$REPO_ROOT/config/terminal.zsh" "$REPO_ROOT/config/plugins.zsh"
 fi
 
 if command -v starship >/dev/null 2>&1; then

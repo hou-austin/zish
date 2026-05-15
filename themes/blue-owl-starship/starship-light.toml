@@ -36,12 +36,12 @@ clock_green = "#3EC669"
 root_purple = "#A313A8"
 white = "#FFFFFF"
 black = "#000000"
-terminal_bg = "#13171D"
+terminal_bg = "#FAFAFA"
 
 [os]
 disabled = false
 format = "[$symbol  ]($style)"
-style = "fg:white"
+style = "fg:black"
 
 [os.symbols]
 Alpaquita = ""
@@ -156,9 +156,9 @@ style = "none"
 
 [character]
 format = "$symbol "
-success_symbol = "[❯](fg:white)"
+success_symbol = "[❯](fg:black)"
 error_symbol = "[❯](fg:#FF0000)"
-vimcmd_symbol = "[❮](fg:white)"
+vimcmd_symbol = "[❮](fg:black)"
 vimcmd_replace_one_symbol = "[❮](fg:git_yellow)"
 vimcmd_replace_symbol = "[❮](fg:git_yellow)"
 vimcmd_visual_symbol = "[❮](fg:cyan)"

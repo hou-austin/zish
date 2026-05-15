@@ -32,3 +32,7 @@ if [[ -d "$ZISH_ROOT/config/local.d" ]]; then
   done
   unset _zish_local_file
 fi
+
+if [[ -r "$ZISH_ROOT/config/plugins.zsh" ]]; then
+  source "$ZISH_ROOT/config/plugins.zsh"
+fi

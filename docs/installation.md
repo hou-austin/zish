@@ -83,8 +83,8 @@ $HOME/.local/share/zish/repo
 1. Print detected platform, shell path, package manager, and repo path.
 2. Check required commands such as `zsh` and `git`.
 3. Check Starship availability when the selected prompt theme requires it.
-4. Check modern CLI tool availability: `eza`, `bat`, `ripgrep`, and `difftastic`.
-5. Check Meslo LGM Nerd Font availability and terminal profile configuration support.
+4. Check modern CLI tool availability: `eza`, `bat`, `ripgrep`, `difftastic`, `fzf`, `zoxide`, and `atuin`.
+5. Check JetBrainsMono Nerd Font availability and terminal profile configuration support.
 6. Inventory existing shell paths.
 7. Show proposed changes, including backups and managed source blocks.
 8. Ask for confirmation.
@@ -115,14 +115,19 @@ Common dependencies:
 
 - `zsh`
 - `starship`
-- `Meslo LGM Nerd Font`
+- `JetBrainsMono Nerd Font`
 - `eza`
 - `bat`
 - `ripgrep`
 - `difftastic`
+- `fzf`
+- `zoxide`
+- `atuin`
+- `zsh-autosuggestions`
+- `zsh-syntax-highlighting`
 - `git`
 - `curl` or another fetch tool if remote plugin installation is supported
-- `fzf`, `ripgrep`, or other optional plugin dependencies when selected
+- Other optional plugin dependencies when selected
 
 ## Success Criteria
 

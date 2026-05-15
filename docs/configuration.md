@@ -39,6 +39,17 @@ The installer may create a managed block in `~/.zshrc` that sources this file. T
 
 The current implementation loads `config/local.zsh` before `config/tools.zsh` and `config/starship.zsh` so users can set prompt and tool preferences locally. It then loads files in `config/local.d/*.zsh` after Starship for normal interactive overrides.
 
+Current managed module order:
+
+1. `config/local.zsh`
+2. `config/tools.zsh`
+3. `config/terminal.zsh`
+4. `config/starship.zsh`
+5. `config/local.d/*.zsh`
+6. `config/plugins.zsh`
+
+`config/plugins.zsh` is last so `zsh-syntax-highlighting` can be sourced at the end of the managed startup path.
+
 ## Local Overrides
 
 Machine-specific or private settings should live outside tracked files. Recommended names:

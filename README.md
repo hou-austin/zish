@@ -2,7 +2,7 @@
 
 Zish is a multiplatform Zsh setup repository for Linux, macOS, and Windows through WSL. It is intended to carry shell themes, plugins, and configuration, plus an installer that can set up the full environment while migrating existing shell files reliably.
 
-Current status: initial documentation, a setup entrypoint, Zsh configuration modules, Starship prompt assets, and modern CLI tool integration. Migration manifests, automated tests, plugins, and broader shell modules still need to be implemented against the contracts in `docs/`.
+Current status: initial documentation, a setup entrypoint, Zsh configuration modules, Starship prompt assets, managed package-based plugins, and modern CLI tool integration. Migration manifests, automated tests, and broader shell modules still need to be implemented against the contracts in `docs/`.
 
 ## Goals
 
@@ -63,8 +63,9 @@ See [docs/principles.md](docs/principles.md) for the decision rules behind these
 - [bootstrap.sh](bootstrap.sh): curl-friendly clone/update wrapper.
 - [install.sh](install.sh): current setup entrypoint.
 - [config/init.zsh](config/init.zsh): managed interactive Zsh entrypoint.
-- [config/tools.zsh](config/tools.zsh): modern CLI integration for `eza`, `bat`, `ripgrep`, and `difftastic`.
-- [config/terminal.zsh](config/terminal.zsh): terminal cursor defaults that can be safely controlled from Zsh.
+- [config/tools.zsh](config/tools.zsh): modern CLI integration for `eza`, `bat`, `ripgrep`, `difftastic`, `fzf`, `zoxide`, and `atuin`.
+- [config/plugins.zsh](config/plugins.zsh): managed package-based Zsh plugin loading for autosuggestions and syntax highlighting.
+- [config/terminal.zsh](config/terminal.zsh): terminal appearance and cursor defaults that can be safely controlled from Zsh.
 - [config/bat.conf](config/bat.conf): default `bat` display settings.
 - [config/ripgreprc](config/ripgreprc): default `ripgrep` behavior.
 - [config/starship.zsh](config/starship.zsh): Starship initialization and theme selection.
