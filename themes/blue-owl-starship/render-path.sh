@@ -4,6 +4,7 @@ set -eu
 blue='1;87;155'
 white='255;255;255'
 black='0;0;0'
+terminal_bg="${ZISH_TERMINAL_BACKGROUND_RGB:-19;23;29}"
 
 fg() {
   printf '\033[38;2;%sm' "$1"
@@ -42,7 +43,7 @@ else
   fi
 fi
 
-fg "$blue"
+fg_bg "$terminal_bg" "$blue"
 printf ''
 fg_bg "$white" "$blue"
 printf ' '
