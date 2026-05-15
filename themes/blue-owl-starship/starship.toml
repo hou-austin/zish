@@ -100,7 +100,7 @@ repo_root_style = "fg:white bg:blue"
 
 [custom.blue_owl_path]
 when = true
-command = '"$(dirname "$STARSHIP_CONFIG")/render-path.sh"'
+command = 'sh "$(dirname "$STARSHIP_CONFIG")/render-path.sh"'
 format = "$output"
 unsafe_no_escape = true
 shell = ["sh"]
