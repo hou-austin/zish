@@ -164,7 +164,7 @@ vimcmd_visual_symbol = "[❮](fg:cyan)"
 
 [username]
 show_always = true
-format = "[](fg:navy)[  $user]($style)"
+format = "[ $user]($style)"
 style_user = "fg:cyan bg:navy"
 style_root = "fg:git_yellow bg:root_purple"
 
@@ -176,6 +176,6 @@ trim_at = "."
 
 [time]
 disabled = false
-format = "[ $time ]($style)[](fg:navy_time)"
+format = "[ $time ]($style)"
 time_format = "%H:%M:%S"
 style = "fg:clock_green bg:navy_time"
