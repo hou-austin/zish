@@ -101,7 +101,7 @@ truncation_length = 32
 truncation_symbol = "..."
 
 [git_status]
-format = "[](fg:git_yellow)[ $all_status$ahead_behind ]($style)[](fg:git_yellow) "
+format = "([](fg:git_yellow)[ $all_status$ahead_behind ]($style)[](fg:git_yellow) )"
 style = "fg:black bg:git_yellow"
 conflicted = "=${count} "
 ahead = "⇡${count} "
