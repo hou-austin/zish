@@ -44,6 +44,10 @@ UNSUPPORTED_TOOLS=""
 FONT_ACTION=none
 FONT_NOTE=""
 FONT_INSTALL_LABEL=""
+FONT_READY=0
+TERMINAL_FONT_NAME="MesloLGM Nerd Font Mono"
+TERMINAL_FONT_ACTION=none
+TERMINAL_FONT_NOTE=""
 
 for tool in $TOOLS; do
   if zish_tool_command_exists "$tool"; then
@@ -96,15 +100,28 @@ zish_install_meslo_linux() {
   rm -rf "$tmp_dir"
 }
 
+zish_configure_apple_terminal_font() {
+  osascript <<'APPLESCRIPT'
+tell application "Terminal"
+  set font name of default settings to "MesloLGM Nerd Font Mono"
+  if (count of windows) > 0 then
+    set font name of current settings of selected tab of front window to "MesloLGM Nerd Font Mono"
+  end if
+end tell
+APPLESCRIPT
+}
+
 case "$(uname -s)" in
   Darwin)
     if zish_macos_meslo_installed; then
       FONT_NOTE="Meslo LGM Nerd Font is installed"
+      FONT_READY=1
     elif [ "$NO_PACKAGE_INSTALL" -eq 1 ]; then
       FONT_NOTE="Meslo LGM Nerd Font install skipped by --no-package-install"
     elif [ "$MANAGER" = brew ]; then
       FONT_ACTION=brew-cask
       FONT_INSTALL_LABEL="brew install --cask font-meslo-lg-nerd-font"
+      FONT_READY=1
     else
       FONT_NOTE="install Meslo LGM Nerd Font manually and set it in your terminal"
     fi
@@ -114,17 +131,44 @@ case "$(uname -s)" in
       FONT_NOTE="WSL detected; install Meslo LGM Nerd Font on the Windows host and set it in Windows Terminal"
     elif zish_linux_meslo_installed; then
       FONT_NOTE="Meslo LGM Nerd Font is installed"
+      FONT_READY=1
     elif [ "$NO_PACKAGE_INSTALL" -eq 1 ]; then
       FONT_NOTE="Meslo LGM Nerd Font install skipped by --no-package-install"
     elif command -v curl >/dev/null 2>&1 && command -v unzip >/dev/null 2>&1; then
       FONT_ACTION=linux-user
       FONT_INSTALL_LABEL="download Meslo.zip into ${XDG_DATA_HOME:-$HOME/.local/share}/fonts/MesloLGMNerdFont"
+      FONT_READY=1
     else
       FONT_NOTE="install Meslo LGM Nerd Font manually; curl and unzip are required for automatic font install"
     fi
     ;;
   *)
     FONT_NOTE="install Meslo LGM Nerd Font manually and set it in your terminal"
+    ;;
+esac
+
+case "$(uname -s)" in
+  Darwin)
+    if [ "${ZISH_CONFIGURE_TERMINAL_FONT:-1}" = 0 ]; then
+      TERMINAL_FONT_NOTE="terminal font configuration skipped by ZISH_CONFIGURE_TERMINAL_FONT=0"
+    elif [ "${TERM_PROGRAM:-}" = Apple_Terminal ] && [ "$FONT_READY" -eq 1 ] && command -v osascript >/dev/null 2>&1; then
+      TERMINAL_FONT_ACTION=apple-terminal
+      TERMINAL_FONT_NOTE="Apple Terminal active profile -> $TERMINAL_FONT_NAME"
+    elif [ "${TERM_PROGRAM:-}" = Apple_Terminal ]; then
+      TERMINAL_FONT_NOTE="Apple Terminal font not changed because Meslo LGM Nerd Font is not installed"
+    else
+      TERMINAL_FONT_NOTE="set your terminal profile font to $TERMINAL_FONT_NAME"
+    fi
+    ;;
+  Linux)
+    if zish_is_wsl; then
+      TERMINAL_FONT_NOTE="set Windows Terminal font.face to $TERMINAL_FONT_NAME on the Windows host"
+    else
+      TERMINAL_FONT_NOTE="set your terminal profile font to $TERMINAL_FONT_NAME"
+    fi
+    ;;
+  *)
+    TERMINAL_FONT_NOTE="set your terminal profile font to $TERMINAL_FONT_NAME"
     ;;
 esac
 
@@ -169,6 +213,7 @@ else
   printf '  font: Meslo LGM Nerd Font\n'
   printf '  font install: %s\n' "$FONT_INSTALL_LABEL"
 fi
+printf '  terminal font: %s\n' "$TERMINAL_FONT_NOTE"
 
 if [ -n "$UNSUPPORTED_TOOLS" ]; then
   printf '  unsupported by detected package manager: %s\n' "$UNSUPPORTED_TOOLS"
@@ -230,6 +275,12 @@ case "$FONT_ACTION" in
     ;;
 esac
 
+case "$TERMINAL_FONT_ACTION" in
+  apple-terminal)
+    zish_configure_apple_terminal_font
+    ;;
+esac
+
 if [ -f "$ZSHRC" ]; then
   mkdir -p "$BACKUP_DIR"
   cp "$ZSHRC" "$BACKUP_DIR/.zshrc"
@@ -280,7 +331,7 @@ mv "${tmp_zshrc}.new" "$ZSHRC"
 rm -f "$tmp_zshrc"
 
 if command -v zsh >/dev/null 2>&1; then
-  zsh -n "$REPO_ROOT/config/init.zsh" "$REPO_ROOT/config/starship.zsh" "$REPO_ROOT/config/tools.zsh"
+  zsh -n "$REPO_ROOT/config/init.zsh" "$REPO_ROOT/config/starship.zsh" "$REPO_ROOT/config/tools.zsh" "$REPO_ROOT/config/terminal.zsh"
 fi
 
 if command -v starship >/dev/null 2>&1; then

@@ -84,12 +84,13 @@ $HOME/.local/share/zish/repo
 2. Check required commands such as `zsh` and `git`.
 3. Check Starship availability when the selected prompt theme requires it.
 4. Check modern CLI tool availability: `eza`, `bat`, `ripgrep`, and `difftastic`.
-5. Inventory existing shell paths.
-6. Show proposed changes, including backups and managed source blocks.
-7. Ask for confirmation.
-8. Apply changes.
-9. Run verification.
-10. Print next steps.
+5. Check Meslo LGM Nerd Font availability and terminal profile configuration support.
+6. Inventory existing shell paths.
+7. Show proposed changes, including backups and managed source blocks.
+8. Ask for confirmation.
+9. Apply changes.
+10. Run verification.
+11. Print next steps.
 
 ## Planned Flags
 

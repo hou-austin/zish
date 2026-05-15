@@ -12,6 +12,14 @@ The Blue Owl Starship theme targets `MesloLGM Nerd Font Mono`, matching the Oh M
 
 Installing the font is not enough by itself. The active terminal profile must use `MesloLGM Nerd Font Mono` or another Meslo LGM Nerd Font family. This is a terminal emulator setting, not a shell startup setting.
 
+The installer auto-configures the font only for macOS Terminal when setup is run from that app. Other terminal apps have separate preference stores and should be configured by their native settings UI:
+
+- Apple Terminal: configured automatically when `TERM_PROGRAM=Apple_Terminal`.
+- iTerm2, Ghostty, WezTerm, Alacritty, Kitty, VS Code, and other macOS/Linux terminals: set the profile font to `MesloLGM Nerd Font Mono`.
+- Windows Terminal for WSL: set `profiles.defaults.font.face` to `MesloLGM Nerd Font Mono` on the Windows host.
+
+Set `ZISH_CONFIGURE_TERMINAL_FONT=0` to skip automatic Apple Terminal font configuration.
+
 ## Cursor
 
 Zish defaults the interactive cursor to a steady underline so the second prompt line resembles the Blue Owl reference. This uses the common DECSCUSR escape sequence and is ignored by terminals that do not support it.
