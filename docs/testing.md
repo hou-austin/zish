@@ -78,7 +78,7 @@ Examples of useful checks:
 - Selected theme file can be sourced.
 - Enabled plugin files can be sourced.
 - `starship print-config` succeeds for the selected Starship config.
-- `starship prompt` and `starship prompt --right` render without configuration errors.
+- `starship prompt` renders without configuration errors.
 - `config/tools.zsh` loads in an interactive Zsh session.
 - `install.sh --dry-run` reports missing tool packages without writing files.
 - `bootstrap.sh --help` works without network access.

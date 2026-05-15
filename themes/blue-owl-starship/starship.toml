@@ -13,10 +13,12 @@ $git_branch\
 $git_status\
 $cmd_duration\
 $status\
+$fill\
+$username\
+$hostname\
+$time\
 $line_break\
 $character"""
-
-right_format = """$username$hostname$time"""
 
 [palettes.blue_owl]
 blue = "#01579B"
@@ -130,6 +132,10 @@ not_executable_symbol = "no-exec "
 not_found_symbol = "not-found "
 sigint_symbol = "SIGINT "
 signal_symbol = "signal "
+
+[fill]
+symbol = " "
+style = "none"
 
 [character]
 format = "$symbol "

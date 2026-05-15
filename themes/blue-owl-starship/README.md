@@ -4,8 +4,9 @@ This theme is a Starship port of the Oh My Posh `blue-owl` theme. It keeps the h
 
 ## Intentional Differences
 
-- The right prompt does not include the decorative leading marker from the original Oh My Posh theme.
-- The right prompt does not include an outline separator between the user/hostname section and the time section.
+- The first prompt line uses Starship's fill module to align user, hostname, and time to the right.
+- The aligned right section does not include the decorative leading marker from the original Oh My Posh theme.
+- The aligned right section does not include an outline separator between the user/hostname section and the time section.
 - The user/hostname and time sections are separated by background and foreground color differences.
 - Git status is represented with Starship's built-in Git modules instead of Oh My Posh templates.
 - The original left-side root marker is not enabled by default because Starship's sudo module adds measurable prompt latency even when it renders nothing.
@@ -24,5 +25,4 @@ Manual test:
 
 ```sh
 STARSHIP_CONFIG="$PWD/themes/blue-owl-starship/starship.toml" starship prompt
-STARSHIP_CONFIG="$PWD/themes/blue-owl-starship/starship.toml" starship prompt --right
 ```

@@ -15,7 +15,7 @@ requires = [
 
 features = [
   "left prompt with OS, directory, Git, duration, status, and character modules",
-  "right prompt with user, hostname, and 24-hour time",
-  "no decorative leading marker before the right prompt",
+  "fill-aligned first-line section with user, hostname, and 24-hour time",
+  "no decorative leading marker before the aligned right section",
   "no powerline separator between user/hostname and time",
 ]

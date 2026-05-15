@@ -43,9 +43,10 @@ For repo-local development, copy `config/local.example.zsh` to `config/local.zsh
 
 Intentional differences:
 
-- No decorative marker before the right prompt.
-- No powerline separator between the right-side user/hostname section and the time section.
-- Color differences separate the right-side sections.
+- User, hostname, and time are aligned on the first prompt line with Starship's fill module instead of native `right_format`, because native Zsh right prompts attach to the cursor line in a two-line prompt.
+- No decorative marker before the aligned right section.
+- No powerline separator between the user/hostname section and the time section.
+- Color differences separate the aligned right-side sections.
 - The left-side root/sudo marker is not enabled by default because the Starship sudo module adds measurable prompt latency when it renders nothing.
 
 ## Performance Rules
@@ -60,6 +61,5 @@ Intentional differences:
 ```sh
 TERM=xterm-256color STARSHIP_CONFIG="$PWD/themes/blue-owl-starship/starship.toml" starship print-config
 TERM=xterm-256color STARSHIP_CONFIG="$PWD/themes/blue-owl-starship/starship.toml" starship prompt --path "$PWD" --status 0 --cmd-duration 1
-TERM=xterm-256color STARSHIP_CONFIG="$PWD/themes/blue-owl-starship/starship.toml" starship prompt --right --path "$PWD" --status 0 --cmd-duration 1
 TERM=xterm-256color STARSHIP_CONFIG="$PWD/themes/blue-owl-starship/starship.toml" starship timings --path "$PWD" --cmd-duration 1
 ```
