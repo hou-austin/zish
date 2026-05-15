@@ -41,6 +41,9 @@ MANAGER=$(zish_detect_package_manager)
 MISSING_TOOLS=""
 PACKAGES=""
 UNSUPPORTED_TOOLS=""
+FONT_ACTION=none
+FONT_NOTE=""
+FONT_INSTALL_LABEL=""
 
 for tool in $TOOLS; do
   if zish_tool_command_exists "$tool"; then
@@ -57,6 +60,73 @@ for tool in $TOOLS; do
     fi
   fi
 done
+
+zish_is_wsl() {
+  [ -r /proc/version ] && grep -qi microsoft /proc/version
+}
+
+zish_macos_meslo_installed() {
+  if command -v brew >/dev/null 2>&1 && brew list --cask font-meslo-lg-nerd-font >/dev/null 2>&1; then
+    return 0
+  fi
+
+  find "$HOME/Library/Fonts" -maxdepth 1 -name 'MesloLGM*NerdFont*.ttf' 2>/dev/null | grep -q .
+}
+
+zish_linux_meslo_installed() {
+  if command -v fc-match >/dev/null 2>&1; then
+    fc-match -f '%{family}\n' 'MesloLGM Nerd Font' 2>/dev/null | grep -qi 'Meslo.*Nerd Font'
+  else
+    find "${XDG_DATA_HOME:-$HOME/.local/share}/fonts" -name 'MesloLGM*NerdFont*.ttf' 2>/dev/null | grep -q .
+  fi
+}
+
+zish_install_meslo_linux() {
+  tmp_dir=$(mktemp -d)
+  font_dir="${XDG_DATA_HOME:-$HOME/.local/share}/fonts/MesloLGMNerdFont"
+
+  mkdir -p "$font_dir"
+  curl -fsSL -o "$tmp_dir/Meslo.zip" https://github.com/ryanoasis/nerd-fonts/releases/latest/download/Meslo.zip
+  unzip -oq "$tmp_dir/Meslo.zip" -d "$font_dir"
+
+  if command -v fc-cache >/dev/null 2>&1; then
+    fc-cache -f "$font_dir" >/dev/null 2>&1 || true
+  fi
+
+  rm -rf "$tmp_dir"
+}
+
+case "$(uname -s)" in
+  Darwin)
+    if zish_macos_meslo_installed; then
+      FONT_NOTE="Meslo LGM Nerd Font is installed"
+    elif [ "$NO_PACKAGE_INSTALL" -eq 1 ]; then
+      FONT_NOTE="Meslo LGM Nerd Font install skipped by --no-package-install"
+    elif [ "$MANAGER" = brew ]; then
+      FONT_ACTION=brew-cask
+      FONT_INSTALL_LABEL="brew install --cask font-meslo-lg-nerd-font"
+    else
+      FONT_NOTE="install Meslo LGM Nerd Font manually and set it in your terminal"
+    fi
+    ;;
+  Linux)
+    if zish_is_wsl; then
+      FONT_NOTE="WSL detected; install Meslo LGM Nerd Font on the Windows host and set it in Windows Terminal"
+    elif zish_linux_meslo_installed; then
+      FONT_NOTE="Meslo LGM Nerd Font is installed"
+    elif [ "$NO_PACKAGE_INSTALL" -eq 1 ]; then
+      FONT_NOTE="Meslo LGM Nerd Font install skipped by --no-package-install"
+    elif command -v curl >/dev/null 2>&1 && command -v unzip >/dev/null 2>&1; then
+      FONT_ACTION=linux-user
+      FONT_INSTALL_LABEL="download Meslo.zip into ${XDG_DATA_HOME:-$HOME/.local/share}/fonts/MesloLGMNerdFont"
+    else
+      FONT_NOTE="install Meslo LGM Nerd Font manually; curl and unzip are required for automatic font install"
+    fi
+    ;;
+  *)
+    FONT_NOTE="install Meslo LGM Nerd Font manually and set it in your terminal"
+    ;;
+esac
 
 if [ "$(uname -s)" = Darwin ]; then
   BACKUP_ROOT="$HOME/Library/Application Support/zish/backups"
@@ -91,6 +161,13 @@ elif [ "$NO_PACKAGE_INSTALL" -eq 1 ]; then
   printf '  install command: skipped by --no-package-install\n'
 else
   printf '  install command: none\n'
+fi
+
+if [ "$FONT_ACTION" = none ]; then
+  printf '  font: %s\n' "$FONT_NOTE"
+else
+  printf '  font: Meslo LGM Nerd Font\n'
+  printf '  font install: %s\n' "$FONT_INSTALL_LABEL"
 fi
 
 if [ -n "$UNSUPPORTED_TOOLS" ]; then
@@ -143,6 +220,15 @@ if [ -n "$PACKAGES" ]; then
   INSTALL_CMD=$(zish_install_command "$MANAGER" "$PACKAGES")
   sh -c "$INSTALL_CMD"
 fi
+
+case "$FONT_ACTION" in
+  brew-cask)
+    brew install --cask font-meslo-lg-nerd-font
+    ;;
+  linux-user)
+    zish_install_meslo_linux
+    ;;
+esac
 
 if [ -f "$ZSHRC" ]; then
   mkdir -p "$BACKUP_DIR"

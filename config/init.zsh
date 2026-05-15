@@ -18,6 +18,10 @@ if [[ -r "$ZISH_ROOT/config/tools.zsh" ]]; then
   source "$ZISH_ROOT/config/tools.zsh"
 fi
 
+if [[ -r "$ZISH_ROOT/config/terminal.zsh" ]]; then
+  source "$ZISH_ROOT/config/terminal.zsh"
+fi
+
 if [[ -r "$ZISH_ROOT/config/starship.zsh" ]]; then
   source "$ZISH_ROOT/config/starship.zsh"
 fi

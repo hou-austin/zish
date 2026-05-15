@@ -11,6 +11,7 @@ $os\
 $directory\
 $git_branch\
 $git_status\
+$custom\
 $cmd_duration\
 $status\
 $fill\
@@ -85,25 +86,26 @@ Unknown = ""
 Windows = ""
 
 [directory]
-format = "[](fg:blue)[ $read_only$path ]($style)"
-repo_root_format = "[](fg:blue)[ $read_only$repo_root$path ]($style)"
+format = "[](fg:blue)[ $read_only$path ]($style)[ ](fg:blue)"
+repo_root_format = "[](fg:blue)[ $read_only$repo_root$path ]($style)[ ](fg:blue)"
 style = "fg:white bg:blue"
 home_symbol = ""
 read_only = " "
-truncation_length = 3
+truncation_length = 2
+truncation_symbol = ".../"
 truncate_to_repo = false
 fish_style_pwd_dir_length = 1
 repo_root_style = "fg:white bg:blue"
 
 [git_branch]
-format = "[](fg:blue bg:git_yellow)[ $symbol$branch(:$remote_branch) ]($style)"
+format = "[](fg:git_yellow)[ $symbol$branch(:$remote_branch) ]($style)"
 style = "fg:black bg:git_yellow"
 symbol = " "
 truncation_length = 32
 truncation_symbol = "..."
 
 [git_status]
-format = "([ $all_status$ahead_behind ]($style))"
+format = "([$all_status$ahead_behind ]($style))"
 style = "fg:black bg:git_yellow"
 conflicted = "=${count} "
 ahead = "⇡${count} "
@@ -117,15 +119,21 @@ staged = "+${count} "
 renamed = "»${count} "
 deleted = "x${count} "
 
+[custom.git_close]
+when = "git rev-parse --is-inside-work-tree >/dev/null 2>&1"
+command = "printf ''"
+format = "[ ](fg:git_yellow)"
+shell = ["sh"]
+
 [cmd_duration]
 min_time = 0
-format = "[](fg:git_yellow)[](fg:duration)[ ${duration} ]($style)[](fg:duration) "
+format = "[](fg:duration)[ ${duration} ]($style)[ ](fg:duration)"
 style = "fg:white bg:duration"
 show_milliseconds = false
 
 [status]
 disabled = false
-format = "[](fg:danger)[ $symbol$status ]($style)[](fg:danger) "
+format = "[](fg:danger)[ $symbol$status ]($style)[ ](fg:danger)"
 style = "fg:white bg:danger"
 symbol = "! "
 not_executable_symbol = "no-exec "

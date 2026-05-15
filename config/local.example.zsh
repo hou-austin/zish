@@ -9,6 +9,10 @@
 # Print a warning when Starship is missing instead of silently skipping prompt setup.
 # export ZISH_WARN_MISSING_STARSHIP=1
 
+# Cursor style: underline, beam, block, blinking_underline, blinking_beam,
+# blinking_block, or none.
+# export ZISH_CURSOR_STYLE="underline"
+
 # Tool integration opt-outs.
 # export ZISH_DISABLE_EZA_ALIASES=1
 # export ZISH_DISABLE_BAT_ALIASES=1

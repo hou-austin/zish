@@ -15,7 +15,7 @@ This theme is a Starship port of the Oh My Posh `blue-owl` theme. It keeps the h
 
 - Zsh.
 - Starship.
-- A Nerd Font in the terminal for prompt symbols.
+- `MesloLGM Nerd Font Mono` configured in the terminal for prompt symbols and spacing.
 
 ## Usage
 

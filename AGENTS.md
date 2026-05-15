@@ -39,6 +39,7 @@ Update documentation when behavior changes:
 - Platform detection or package manager support: `docs/platforms.md`
 - Core priorities or decision rules: `docs/principles.md`
 - Starship prompt behavior: `docs/starship.md`
+- Terminal font and cursor behavior: `docs/terminal.md`
 - Zsh startup files or config layout: `docs/configuration.md`
 - Modern CLI tool integration: `docs/tools.md`
 - Prompt themes: `docs/themes.md`

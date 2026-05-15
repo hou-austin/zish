@@ -114,6 +114,7 @@ Common dependencies:
 
 - `zsh`
 - `starship`
+- `Meslo LGM Nerd Font`
 - `eza`
 - `bat`
 - `ripgrep`

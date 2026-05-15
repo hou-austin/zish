@@ -46,6 +46,7 @@ See [docs/principles.md](docs/principles.md) for the decision rules behind these
 |   |-- principles.md
 |   |-- plugins.md
 |   |-- starship.md
+|   |-- terminal.md
 |   |-- testing.md
 |   |-- themes.md
 |   `-- tools.md
@@ -63,6 +64,7 @@ See [docs/principles.md](docs/principles.md) for the decision rules behind these
 - [install.sh](install.sh): current setup entrypoint.
 - [config/init.zsh](config/init.zsh): managed interactive Zsh entrypoint.
 - [config/tools.zsh](config/tools.zsh): modern CLI integration for `eza`, `bat`, `ripgrep`, and `difftastic`.
+- [config/terminal.zsh](config/terminal.zsh): terminal cursor defaults that can be safely controlled from Zsh.
 - [config/bat.conf](config/bat.conf): default `bat` display settings.
 - [config/ripgreprc](config/ripgreprc): default `ripgrep` behavior.
 - [config/starship.zsh](config/starship.zsh): Starship initialization and theme selection.
@@ -125,6 +127,7 @@ Migration details are defined in [docs/migration.md](docs/migration.md).
 - [Platforms](docs/platforms.md): Linux, macOS, and WSL behavior.
 - [Principles](docs/principles.md): core priorities and decision invariants.
 - [Starship](docs/starship.md): prompt integration and theme porting rules.
+- [Terminal](docs/terminal.md): host font and cursor configuration.
 - [Configuration](docs/configuration.md): Zsh config layering and local overrides.
 - [Themes](docs/themes.md): theme packaging and prompt requirements.
 - [Tools](docs/tools.md): modern CLI dependencies and shell integration.
